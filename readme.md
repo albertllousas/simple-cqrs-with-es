@@ -77,12 +77,12 @@ But, sadly it also comes with drawbacks:
    can lead you to a very inconsistent state of your system. 
 
 The only way to avoid dual writes is to split the communication into multiple steps and only write to one
- external system during each step:
+ external system during each step, here some solutions:
 
-- Do it by yourself, if you use a RDBMS you can create an event-log table, then you can wrap in the same transaction all
- the changes in your domain with adding an event to the event table. After that you can fetch the events with simple
-  schedulers or complex (Schedlock) and send a message to the projection mechanism. Note: Your projection mechanism will have to
- handle with idempotency because the fetch can also fail.
+- Do it by yourself, if you use a RDBMS you can create an event-log table, then you can wrap the updates in your domain
+ and the event-log in the same transaction. After that you can fetch the events with simple schedulers or complex (Schedlock) 
+ and send a message to the projection mechanism. 
+ Note: Your projection mechanism will have to handle with idempotency because the fetch can also fail.
 - Use [CDC](https://en.wikipedia.org/wiki/Change_data_capture) tools (change data capture), like Debezium, they will
  capture and propagate the changes ensuring consistency.
 - Use an event-store in the write side, this will be explained in the following section.  
