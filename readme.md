@@ -106,7 +106,7 @@ Till now, we have implemented CQRS, but CQRS doesn't come alone in term of patte
 So let's see how the system would look like:
 
 <p align="center">
-  <img src="misc/CQRS-ES-Extended.png" width="70%"/>
+  <img src="misc/CQRS-ES-Extended.png"/>
 </p>
 
 ## Problem: Order management system
