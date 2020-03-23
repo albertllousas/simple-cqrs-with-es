@@ -21,7 +21,7 @@ But, let's see a more elaborate but brief explanation in the next sections ...
 The typical approach of an application/micro-service without applying CQRS looks like this:
 
 <p align="center">
-  <img src="misc/NO-CQRS.png"  width="70%"/>
+  <img src="misc/NO-CQRS.png"  width="55%"/>
 </p>
 
 There is one model, where the app performs writes and reads and we use the same classes for same use cases.
@@ -35,7 +35,7 @@ In it's simplest form CQRS only needs to segregate the responsibility between co
 queries (read requests). The write requests and the read requests are handled by different objects.
 
 <p align="center">
-  <img src="misc/Simple-CQRS.png"  width="70%"/>
+  <img src="misc/Simple-CQRS.png"  width="55%"/>
 </p>
 
 One write model, which you can use to change the state of your domain objects. Then multiple read models, one for
@@ -51,7 +51,7 @@ But let's evolve this to next step ...
 The next natural step is to separate the storage as well in two sides, the write side and the read side.
 
 <p align="center">
-  <img src="misc/CQRS.png"  width="70%"/>
+  <img src="misc/CQRS.png"  width="55%"/>
 </p>
 
 The write side represents the state of the application and the read side are the projections (schemas optimized to
@@ -94,7 +94,7 @@ Last step is to introduce [event sourcing](https://microservices.io/patterns/dat
   idea is the same as the previous approach but using an event store.
 
 <p align="center">
-  <img src="misc/CQRS-ES.png"  width="70%"/>
+  <img src="misc/CQRS-ES.png"  width="55%"/>
 </p>
 
 Instead of keeping only the current state of the system updating it when we have a change, we will represent
