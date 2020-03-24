@@ -1,10 +1,12 @@
-# Simple CQRS with event-sourcing
+# Simple CQRS with event-sourcing: Tracking order service
 
 The following repository tries to describe a basic CQRS with Kotlin and Ktor as a base framework, our main goal is
  understand through a simple implementation this pattern.
  
-Is out of scope to debate advantages/disadvantages or use-cases of this pattern, we will provide links if you are
- interested in the last section of this post.
+**This is not production code, this is a CQRS implementation in order to understand the pattern.**
+
+Also, I am not an expert on the topic, not even a beginner, so this is a way to learn.
+ 
  
 ## CQRS overview
 
@@ -100,28 +102,36 @@ Last step is to introduce [event sourcing](https://microservices.io/patterns/dat
 Instead of keeping only the current state of the system updating it when we have a change, we will represent
  entities as a sequential list of events.
 
-Till now, we have implemented CQRS, but CQRS doesn't come alone in term of patterns, they are not really
- mandatory or needed but CQRS come together with: DDD, command bus, messaging, async, SAGAs or hexagonal architecture.
- 
-So let's see how the system would look like:
+Till now, we have implemented CQRS, but usually CQRS doesn't come alone in term of patterns, so let's see how the
+ system would look like with everything:
 
 <p align="center">
   <img src="misc/CQRS-ES-Extended.png"/>
 </p>
 
-## Problem: Order management system
+Patterns that come with CQRS:
+- DDD Aggregates
+- Command-bus
+- Events 
+- SAGAs
+- Optimistic locking
+
+Any of these patterns are mandatory to do CQRS, it does not imply to use any of them, in prod environments you can omit
+ them if they are over-complicating your system.
+
+Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
+
+## Service
+
 
 ### Applying CQRS
 
 ## Related links
 
-- [General FAQ] (http://www.cqrs.nu/faq)
+- [General FAQ](http://www.cqrs.nu/faq)
 - [Greg Young original document](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
 - [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html)
-
-https://sookocheff.com/post/architecture/what-is-cqrs/
-https://dzone.com/articles/cqrs-and-event-sourcing-intro-for-developers
-https://www.lightbend.com/blog/cloud-native-app-design-techniques-cqrs-event-sourcing-messaging
-
+- [Things to consider](https://www.sderosiaux.com/articles/2019/08/29/cqrs-why-and-all-the-things-to-consider/)
+- [DZone CQRS intro](https://dzone.com/articles/cqrs-and-event-sourcing-intro-for-developers)
