@@ -3,6 +3,7 @@
  */
 package com.alo.cqrs.orders
 
+import com.alo.cqrs.todolist.App
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
