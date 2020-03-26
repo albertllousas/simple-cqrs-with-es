@@ -116,19 +116,74 @@ Patterns that come with CQRS:
 - SAGAs
 - Optimistic locking
 
-Any of these patterns are mandatory to do CQRS, it does not imply to use any of them, in prod environments you can omit
- them if they are over-complicating your system.
+Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit them if
+ they are over-complicating your system.
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 
-## Service
+## Simple todo-list Service
 
+Let's think about a fake company, they have an internal micro-services ecosystem and they need to build a new
+ feature for all the frontends ... Boom! a TODO-LIST to help the customers to keep track of daily obligations.
 
-### Applying CQRS
+So, our sample application is a super simple TODO-LIST micro-service, where:
+
+MVP:
+```
+- A todo-list can be created 
+- We can add a task to a todo list
+- We can mark a task as done
+- When all tasks on a todo-list are done, automatically, todo-list will be marked a as done as well 
+```
+Second iteration:
+```
+- Rename todo-lists
+- Rename tasks
+- Delete todo-lists
+- Delete tasks
+- Prioritise tasks
+```
+
+### Domain model
+
+I will try to apply DDD concepts, sorry if I make mistakes but I am not an expert.
+
+Let's map out our business domain for the MVP:
+
+- Aggregate Root: `TodoList`
+- Entities: `Task`
+- Value objects: `Status`, `TodoListId`, `TaskId`, `UserId` (user reference)
+- Domain events: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
+- Aggregate: All of them
+
+DDD [definitions](https://dddcommunity.org/resources/ddd_terms/)
+
+### CQRS and hexagonal architecture
+
+// TODO
+
+## tech stack
+
+* Language: Kotlin
+* JVM: 1.8.0*
+* Web server: [Ktor](https://ktor.io/)
+* Testing libraries/frameworks:
+    * [JUnit 5](https://junit.org/junit5/docs/current/user-guide/)
+    * [Assertj](https://joel-costigliola.github.io/assertj/)
+    * [Mockk](https://mockk.io/)
+    * [REST Assured](http://rest-assured.io/)
+
+## Running tests
+```shell
+./gradlew test
+```
+## Run the app
+
+// TODO
 
 ## Related links
 
-- [General FAQ](http://www.cqrs.nu/faq)
+- [CQRS](http://www.cqrs.nu/)
 - [Greg Young original document](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
 - [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
