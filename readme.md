@@ -162,6 +162,8 @@ DDD [definitions](https://dddcommunity.org/resources/ddd_terms/)
 
 // TODO
 
+application: commandbus, command-handlers 
+
 ## tech stack
 
 * Language: Kotlin
