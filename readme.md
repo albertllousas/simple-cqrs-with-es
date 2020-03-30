@@ -73,17 +73,30 @@ But, sadly it also comes with drawbacks:
 - Complexity: Now we have a more complex application design.
 - Eventual consistency: Now the read side will be eventually consistent, so we will have to deal with distributed
  transactions. 
-- **Dual writes**: A dual write describes the situation when you change data in 2 systems using local transactions, for
- example a database and queue or other database, without an additional layer that ensures data consistency over both
-  services. In almost all the post that you can find over internet about CQRS, this problem is underestimated but it
-   can lead you to a very inconsistent state of your system. 
+- Dual writes
 
-The only way to avoid dual writes is to split the communication into multiple steps and only write to one
+#### Dual writes
+ A dual write describes the situation when you change data in 2 systems using local transactions, for
+ example inserting a record in a database and send a message to a queue in a local transaction; 
+ Imagine a situation like this:
+```kotlin
+transaction.begin() 
+database.insert(record) 
+queue.send(message)
+transaction.commit() 
+``` 
+Now, let's say that this codes is executed, but transaction commit fails, without an additional layer that ensures
+ data consistency over both services, there is no way to rollback the message if it was already sent.
+ 
+ In almost all the post that you can find over internet about CQRS, this problem is underestimated but it can lead you 
+ to a very inconsistent state of your system. 
+
+The way to solve/avoid dual writes is to split the communication into multiple steps and only write to one
  external system during each step, here some solutions:
 
-- Do it by yourself, if you use a RDBMS you can create an event-log table, then you can wrap the updates in your domain
- and the event-log in the same transaction. After that you can fetch the events with simple schedulers or complex (Schedlock) 
- and send a message to the projection mechanism. 
+- [Transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html):If you use a RDBMS
+ you can create an event-log table, then you can wrap the updates in your domain and the event-log in the same
+  transaction. After that you can fetch the events with simple schedulers or complex (Schedlock) and send a message to the projection mechanism. 
  Note: Your projection mechanism will have to handle with idempotency because the fetch can also fail.
 - Use [CDC](https://en.wikipedia.org/wiki/Change_data_capture) tools (change data capture), like Debezium, they will
  capture and propagate the changes ensuring consistency.
