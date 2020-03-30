@@ -18,7 +18,7 @@ import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
 import org.assertj.core.api.Assertions
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class TodoListRoutesTest {
 

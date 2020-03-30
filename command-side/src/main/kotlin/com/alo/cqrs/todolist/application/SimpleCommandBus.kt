@@ -3,20 +3,29 @@ package com.alo.cqrs.todolist.application
 import com.alo.cqrs.todolist.domain.ports.inbound.Command
 import com.alo.cqrs.todolist.domain.ports.inbound.CommandBus
 import com.alo.cqrs.todolist.domain.ports.inbound.CommandHandler
-import java.lang.reflect.ParameterizedType
+import kotlin.reflect.KClass
 
-class SimpleCommandBus(commandHandlers: List<CommandHandler<Command>>): CommandBus {
+class SimpleCommandBus : CommandBus {
 
-    private val register: Map<Class<out Any>, CommandHandler<Command>>
+    private val commandHandlers = mutableMapOf<KClass<out Command>, CommandHandler<out Command>>()
 
-    init {
-        register = commandHandlers.map {
-            val clazz = (it.javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<*>
-            clazz to it
-        }.toMap()
+    inline fun <reified T : Command> register(commandHandler: CommandHandler<T>): SimpleCommandBus {
+        `access$commandHandlers`[T::class] = commandHandler
+        return this
     }
+
 
     override suspend fun <T : Command> dispatch(command: T) {
-        ((register[command::class.java]) as CommandHandler<T>).handle(command)
+        (commandHandlers.getOrElse(
+            key = command::class, defaultValue = { throw CommandHandlerNotRegisteredException(command::class) }
+        ) as CommandHandler<T>).handle(command)
     }
+
+    @PublishedApi
+    internal val `access$commandHandlers`: MutableMap<KClass<out Command>, CommandHandler<out Command>>
+        get() = commandHandlers
 }
+
+class CommandHandlerNotRegisteredException(clazz: KClass<out Command>) : Exception(
+    "No CommandHandler registered to handle ${clazz.simpleName}"
+)
