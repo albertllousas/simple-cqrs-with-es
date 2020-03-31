@@ -1,4 +1,4 @@
-# Simple CQRS, event-sourcing, DDD and hexagonal architecture: Tracking order service
+# CQRS, event-sourcing, DDD and hexagonal architecture: Tracking order service
 
 The following repository tries to describe a basic CQRS with Kotlin and Ktor as a base framework, our main goal is
  understand through a simple implementation this pattern.
@@ -181,8 +181,8 @@ This restriction has some implications in the design:
 - Domain objects should generate events when it's state changes.
 - Domain objects should be able to be reconstructed from an event stream.
 - We will need an event-store.
-- Our repositories will now `get` and `save` aggregates, but under the hood it will be just streams of events.
-- And more, check the links for more information about event sourcing.
+- Our repositories will just `get` and `save` aggregates, but under the hood it will be streams of events.
+- And more implications and complexities ... check the links at the end for more information about event sourcing.
 
 These are the events that we will handle: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
 
