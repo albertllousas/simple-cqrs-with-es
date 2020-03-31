@@ -1,4 +1,4 @@
-# Simple CQRS with event-sourcing: Tracking order service
+# Simple CQRS, event-sourcing, DDD and hexagonal architecture: Tracking order service
 
 The following repository tries to describe a basic CQRS with Kotlin and Ktor as a base framework, our main goal is
  understand through a simple implementation this pattern.
@@ -157,7 +157,7 @@ Second iteration:
 - Prioritise tasks
 ```
 
-### Domain model
+### Domain model with DDD
 
 I will try to apply DDD concepts, sorry if I make mistakes but I am not an expert.
 
@@ -171,11 +171,42 @@ Let's map out our business domain for the MVP:
 
 DDD [definitions](https://dddcommunity.org/resources/ddd_terms/)
 
-### CQRS and hexagonal architecture
+### Event sourcing
 
-// TODO
+In a nutshell, event sourcing differs from a typical approach on how a business object is persisted, instead of
+ storing the current state, it stores a sequence of state changing events.
 
-application: commandbus, command-handlers 
+This restriction has some implications in the design:
+
+- Domain objects should generate events when it's state changes.
+- Domain objects should be able to be reconstructed from an event stream.
+- We will need an event-store.
+- Our repositories will now `get` and `save` aggregates, but under the hood it will be just streams of events.
+- And more, check the links for more information about event sourcing.
+
+These are the events that we will handle: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
+
+
+### Fitting everything in hexagonal architecture
+
+Till now we have CQRS, DDD and event-sourcing, but now we have to fit everything over an architectural pattern, and
+ in our case it is hexagonal architecture, check this [other repo on my github](https://github.com/albertllousas/implementing-hexagonal-architecture) for a detailed explanation of the
+  pattern.
+
+Trying to fit all the components in an hexagonal architecture is not easy at all, but let's see how a general diagram
+ of cqrs over hexagonal would look like (since query-side is easier, just pay attention in the command side):
+ 
+<p align="center">
+  <img src="misc/cqrs-hexa-1.png"  width="55%"/>
+</p> 
+
+And now let's focus in our problem (only command-side):
+
+<p align="center">
+  <img src="misc/cqrs-hexa-2.png"  width="55%"/>
+</p> 
+
+### Package structure
 
 ## tech stack
 
@@ -203,5 +234,6 @@ application: commandbus, command-handlers
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
 - [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html)
+- [Event Sourcing by Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html)
 - [Things to consider](https://www.sderosiaux.com/articles/2019/08/29/cqrs-why-and-all-the-things-to-consider/)
 - [DZone CQRS intro](https://dzone.com/articles/cqrs-and-event-sourcing-intro-for-developers)

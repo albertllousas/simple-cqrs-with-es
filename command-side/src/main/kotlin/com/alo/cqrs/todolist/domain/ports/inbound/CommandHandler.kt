@@ -1,5 +1,7 @@
 package com.alo.cqrs.todolist.domain.ports.inbound
 
-interface CommandHandler<T: Command> {
+import com.alo.cqrs.todolist.domain.model.Commands
+
+interface CommandHandler<T: Commands> {
     fun handle(command: T)
 }
