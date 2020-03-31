@@ -197,13 +197,13 @@ Trying to fit all the components in an hexagonal architecture is not easy at all
  of cqrs over hexagonal would look like (since query-side is easier, just pay attention in the command side):
  
 <p align="center">
-  <img src="misc/cqrs-hexa-1.png"  width="55%"/>
+  <img src="misc/cqrs-hexa-1.png"  width="85%"/>
 </p> 
 
 And now let's focus in our problem (only command-side):
 
 <p align="center">
-  <img src="misc/cqrs-hexa-2.png"  width="55%"/>
+  <img src="misc/cqrs-hexa-2.png"  width="95%"/>
 </p> 
 
 ### Package structure
