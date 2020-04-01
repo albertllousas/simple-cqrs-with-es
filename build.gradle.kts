@@ -38,6 +38,7 @@ subprojects {
         testImplementation("io.rest-assured:rest-assured:3.3.0") {
             exclude(group = "com.sun.xml.bind", module = "jaxb-osgi")
         }
+        testImplementation("com.github.javafaker:javafaker:1.0.1")
     }
 
     tasks.apply {

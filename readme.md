@@ -208,6 +208,14 @@ And now let's focus in our problem (only command-side):
 
 ### Package structure
 
+The project has been split in three different modules:
+- `command-side`: All the write side code
+- `query-side`: read side code
+- `app`: Wiring up and app runner
+
+Package structure for command-side:
+
+
 ## tech stack
 
 * Language: Kotlin
@@ -231,6 +239,7 @@ And now let's focus in our problem (only command-side):
 
 - [CQRS](http://www.cqrs.nu/)
 - [Greg Young original document](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
+- [Greg Young m-r sample](https://github.com/gregoryyoung/m-r)
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
 - [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html)

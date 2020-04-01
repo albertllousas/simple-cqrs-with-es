@@ -1,6 +1,6 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.inbound.ktor
 
-import com.alo.cqrs.todolist.domain.model.Commands
+import com.alo.cqrs.todolist.domain.model.Command
 import com.alo.cqrs.todolist.infrastructure.service.bus.CommandBus
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.install
@@ -30,7 +30,7 @@ class TodoListRoutesTest {
     fun `should accept to create a todo-list`(): Unit =
         withTestApp {
             val request = CreateTodoListHttpRequest("my daily tasks")
-            coEvery { commandBus.dispatch(Commands.CreateTodoList(request.name)) } just Runs
+            coEvery { commandBus.dispatch(Command.CreateTodoList(request.name)) } just Runs
 
             val call = handleRequest(HttpMethod.Post, "/todo-lists") {
                 addHeader("Content-Type", "application/json")
@@ -44,7 +44,7 @@ class TodoListRoutesTest {
     fun `should accept to create a todo-list when dispatch command fails`(): Unit =
         withTestApp {
             val request = CreateTodoListHttpRequest("my daily tasks")
-            coEvery { commandBus.dispatch(Commands.CreateTodoList(request.name)) } coAnswers { throw Exception("Boom!") }
+            coEvery { commandBus.dispatch(Command.CreateTodoList(request.name)) } coAnswers { throw Exception("Boom!") }
 
             val call = handleRequest(HttpMethod.Post, "/todo-lists") {
                 addHeader("Content-Type", "application/json")

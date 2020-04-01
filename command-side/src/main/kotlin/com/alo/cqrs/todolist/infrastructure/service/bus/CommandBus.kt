@@ -1,7 +1,7 @@
 package com.alo.cqrs.todolist.infrastructure.service.bus
 
-import com.alo.cqrs.todolist.domain.model.Commands
+import com.alo.cqrs.todolist.domain.model.Command
 
 interface CommandBus {
-    suspend fun <T: Commands> dispatch(command: T)
+    suspend fun <T: Command> dispatch(command: T)
 }

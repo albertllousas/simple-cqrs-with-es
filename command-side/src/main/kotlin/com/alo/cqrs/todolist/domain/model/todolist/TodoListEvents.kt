@@ -5,4 +5,4 @@ import java.util.UUID
 
 sealed class TodoListEvent: DomainEvent()
 
-data class TodoListCreated(val id: UUID, val name: String)
+data class TodoListCreated(val id: UUID, val name: String): TodoListEvent()

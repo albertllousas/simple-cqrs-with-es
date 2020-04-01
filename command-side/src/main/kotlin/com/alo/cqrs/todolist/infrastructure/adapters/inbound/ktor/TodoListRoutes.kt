@@ -1,6 +1,6 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.inbound.ktor
 
-import com.alo.cqrs.todolist.domain.model.Commands
+import com.alo.cqrs.todolist.domain.model.Command
 import com.alo.cqrs.todolist.infrastructure.service.bus.CommandBus
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -19,14 +19,14 @@ private val logger = LoggerFactory.getLogger("Route.totoLists")
 fun Route.totoLists(commandBus: CommandBus) = route("/todo-lists") {
     post {
         val request = call.receive<CreateTodoListHttpRequest>()
-        commandBus.safeDispatch(Commands.CreateTodoList(name = request.name))
+        commandBus.safeDispatch(Command.CreateTodoList(name = request.name))
         call.respond(HttpStatusCode.Accepted)
     }
 }
 
 data class CreateTodoListHttpRequest(val name: String)
 
-private fun <T : Commands> CommandBus.safeDispatch(command: T) {
+private fun <T : Command> CommandBus.safeDispatch(command: T) {
     GlobalScope.launch(exceptionHandler) {
         this@safeDispatch.dispatch(command)
     }
