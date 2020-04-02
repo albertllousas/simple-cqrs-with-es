@@ -6,22 +6,19 @@ abstract class AggregateId {
     abstract val value: UUID
 }
 
-abstract class AggregateRoot(
-    history: List<out DomainEvent>
-) {
-
+abstract class AggregateRoot() {
     abstract val id: AggregateId
+    abstract val uncommittedChanges : List<DomainEvent>
+}
 
-    private val uncommittedChanges = mutableListOf<DomainEvent>() // this make it immutable?
+abstract class AggregateRootFactory<AR: AggregateRoot> {
 
-    val uncommittedEvents: List<DomainEvent>
-        get() = uncommittedChanges
+    fun recreate(history: List<DomainEvent>): AR? = apply(history.tail(), null)
 
-    init {
-        history.forEach { event -> applyChange(event) }
-    }
+    private tailrec fun apply(stream: List<DomainEvent>, acc: AR?): AR? =
+        if(stream.isEmpty()) acc
+        else apply(stream.tail(), applyChange(stream.first(), acc))
 
-    protected fun applyNewChange(event: DomainEvent)  = applyChange(event).also { uncommittedChanges.add(event) }
+    protected abstract fun applyChange(event: DomainEvent, currentState: AR?) : AR
 
-    protected abstract fun applyChange(event: DomainEvent)
 }

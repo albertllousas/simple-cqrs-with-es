@@ -2,44 +2,32 @@ package com.alo.cqrs.todolist.domain.model.todolist
 
 import com.alo.cqrs.todolist.domain.model.AggregateId
 import com.alo.cqrs.todolist.domain.model.AggregateRoot
+import com.alo.cqrs.todolist.domain.model.AggregateRootFactory
 import com.alo.cqrs.todolist.domain.model.DomainEvent
 import com.alo.cqrs.todolist.domain.model.UnsupportedEventException
 import java.util.UUID
 
 data class TodoListId(override val value: UUID) : AggregateId()
 
-class TodoList(history: List<DomainEvent>) : AggregateRoot(history) {
+data class TodoList private constructor(
+    override val id: TodoListId,
+    val name: String,
+    override val uncommittedChanges: List<DomainEvent>
+) : AggregateRoot() {
 
-    override lateinit var id: TodoListId
-        private set
+    companion object Factory: AggregateRootFactory<TodoList>() {
 
-    lateinit var name: String
-        private set
+        fun create(id: TodoListId, name: String): TodoList =
+            TodoList(id = id, name = name, uncommittedChanges = listOf(TodoListCreated(id.value, name)))
 
-    override fun applyChange(event: DomainEvent) {
-        if(event is TodoListEvent) {
-            when (event) {
-                is TodoListCreated -> apply(event)
-            }.exhaustive
-        } else {
-            throw UnsupportedEventException(aggregateClass = this::class, eventClass = event::class)
-        }
-    }
+        fun restoreState(id: TodoListId, name: String, uncommittedChanges: List<DomainEvent>): TodoList =
+            TodoList(id = id, name = name, uncommittedChanges = uncommittedChanges)
 
-    private fun apply(event: TodoListCreated) {
-        this.name = event.name
-        this.id = TodoListId(event.id)
-    }
-
-
-    companion object {
-        fun createNew(id: TodoListId, name: String): TodoList {
-            val event = TodoListCreated(id = id.value, name = name)
-            return TodoList(emptyList()).apply {
-                applyNewChange(event)
-            }
-        }
+        override fun applyChange(event: DomainEvent, currentState: TodoList?) : TodoList =
+             if (event is TodoListEvent)
+                when (event) {
+                    is TodoListCreated -> create(TodoListId(event.id), event.name)
+                }
+             else throw UnsupportedEventException(aggregateClass = TodoList::class, eventClass = event::class)
     }
 }
-
-val Any?.exhaustive get() = Unit
