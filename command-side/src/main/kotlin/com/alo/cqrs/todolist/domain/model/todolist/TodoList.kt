@@ -23,7 +23,7 @@ data class TodoList private constructor(
         fun restoreState(id: TodoListId, name: String, uncommittedChanges: List<DomainEvent>): TodoList =
             TodoList(id = id, name = name, uncommittedChanges = uncommittedChanges)
 
-        override fun applyChange(event: DomainEvent, currentState: TodoList?) : TodoList =
+        override fun applyChange(event: DomainEvent, currentState: TodoList?) : TodoList? =
              if (event is TodoListEvent)
                 when (event) {
                     is TodoListCreated -> create(TodoListId(event.id), event.name)

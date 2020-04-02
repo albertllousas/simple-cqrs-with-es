@@ -19,6 +19,6 @@ abstract class AggregateRootFactory<AR: AggregateRoot> {
         if(stream.isEmpty()) acc
         else apply(stream.tail(), applyChange(stream.first(), acc))
 
-    protected abstract fun applyChange(event: DomainEvent, currentState: AR?) : AR
+    protected abstract fun applyChange(event: DomainEvent, currentState: AR?) : AR?
 
 }
