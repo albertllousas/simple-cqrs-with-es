@@ -25,9 +25,7 @@ class TodoListInMemoryEventSourcedRepository(
 
     override fun get(id: TodoListId): TodoList? =
         eventStore.load(id.value)
-            .let { it.map {
-                event -> objectMapper.readValue(event.payload, event.clazz) as DomainEvent
-            } }
+            .let { it.map { event -> objectMapper.readValue(event.payload, event.clazz) as DomainEvent } }
             .let { TodoList.Factory.recreate(it) }
 
 }
