@@ -1,4 +1,4 @@
-package com.alo.cqrs.todolist.infrastructure.service.bus
+package com.alo.cqrs.todolist.infrastructure.cqrs.bus
 
 import com.alo.cqrs.todolist.domain.model.Command
 import com.alo.cqrs.todolist.domain.ports.inbound.CommandHandler

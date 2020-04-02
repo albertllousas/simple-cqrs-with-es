@@ -131,6 +131,8 @@ Patterns that come with CQRS:
 
 Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit them if
  they are over-complicating your system.
+ 
+It is important to mention, that as Martin fowler explains in this talk, you don't need even to make commands async, 
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 

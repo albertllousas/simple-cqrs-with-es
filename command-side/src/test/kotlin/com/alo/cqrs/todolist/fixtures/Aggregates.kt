@@ -12,5 +12,5 @@ private val faker = Faker()
 fun buildTodoList(
     id: TodoListId = TodoListId(UUID.randomUUID()),
     name: String = faker.funnyName().name(),
-    history: List<DomainEvent> = listOf(TodoListCreated(id.value, name))
-) = TodoList.Factory.restoreState(id, name, history)
+    uncommittedChanges: List<DomainEvent> = listOf(TodoListCreated(id.value, name))
+) = TodoList.Factory.restoreState(id, name, uncommittedChanges)

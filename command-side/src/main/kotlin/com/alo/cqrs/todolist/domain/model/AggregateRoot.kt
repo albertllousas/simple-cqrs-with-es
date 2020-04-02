@@ -13,7 +13,7 @@ abstract class AggregateRoot() {
 
 abstract class AggregateRootFactory<AR: AggregateRoot> {
 
-    fun recreate(history: List<DomainEvent>): AR? = apply(history.tail(), null)
+    fun recreate(history: List<DomainEvent>): AR? = apply(history, null)
 
     private tailrec fun apply(stream: List<DomainEvent>, acc: AR?): AR? =
         if(stream.isEmpty()) acc

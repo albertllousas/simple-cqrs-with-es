@@ -1,7 +1,7 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.inbound.ktor
 
 import com.alo.cqrs.todolist.domain.model.Command
-import com.alo.cqrs.todolist.infrastructure.service.bus.CommandBus
+import com.alo.cqrs.todolist.infrastructure.cqrs.bus.CommandBus
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
