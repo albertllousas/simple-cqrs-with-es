@@ -22,7 +22,23 @@ class TodoListTest {
 
             val todoList = TodoList.Factory.create(id = todoListId, name = name)
 
-            val expected = buildTodoList(todoListId, name, listOf(TodoListCreated(todoListId.value, name)))
+            val expected = buildTodoList(
+                id= todoListId,
+                name = name,
+                uncommittedChanges = listOf(TodoListCreated(todoListId.value, name))
+            )
+            assertThat(todoList).isEqualTo(expected)
+        }
+
+        @Test
+        fun `should recreate a todo list from history`() {
+            val todoListId = TodoListId(UUID.randomUUID())
+            val name = "my todo list"
+            val pastEvent = TodoListCreated(todoListId.value, name)
+
+            val todoList = TodoList.Factory.recreate(listOf(pastEvent))
+
+            val expected = buildTodoList(todoListId, name)
             assertThat(todoList).isEqualTo(expected)
         }
     }

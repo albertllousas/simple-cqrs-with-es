@@ -26,7 +26,7 @@ data class TodoList private constructor(
         override fun applyChange(event: DomainEvent, currentState: TodoList?) : TodoList? =
              if (event is TodoListEvent)
                 when (event) {
-                    is TodoListCreated -> create(TodoListId(event.id), event.name)
+                    is TodoListCreated -> restoreState(TodoListId(event.id), event.name, emptyList())
                 }
              else throw UnsupportedEventException(aggregateClass = TodoList::class, eventClass = event::class)
     }
