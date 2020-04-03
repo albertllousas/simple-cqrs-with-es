@@ -126,7 +126,6 @@ Patterns that come with CQRS:
 - DDD Aggregates
 - Command-bus
 - Events 
-- SAGAs
 - Optimistic locking
 
 Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit them if
@@ -168,7 +167,7 @@ Let's map out our business domain for the MVP:
 - Aggregate Root: `TodoList`
 - Entities: `Task`
 - Value objects: `Status`, `TodoListId`, `TaskId`, `UserId` (user reference)
-- Domain events: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
+- Factories: `TodoList.Factory`
 - Aggregate: All of them
 
 DDD [definitions](https://dddcommunity.org/resources/ddd_terms/)
