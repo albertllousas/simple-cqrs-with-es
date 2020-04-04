@@ -214,6 +214,12 @@ The project has been split in three different modules:
 - `query-side`: read side code
 - `app`: Wiring up and app runner
 
+Projects follow the Hexagonal architecture with this packaging:
+
+- Application: Application Services (the use cases), in our case as command-handlers
+- Domain model: domain and ports
+- Infrastructure: Outside world, adapters and non-hexagonal components 
+
 Package structure for command-side:
 
 

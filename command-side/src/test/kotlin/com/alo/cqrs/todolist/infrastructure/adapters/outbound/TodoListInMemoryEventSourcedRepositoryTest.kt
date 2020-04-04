@@ -4,8 +4,8 @@ import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
 import com.alo.cqrs.todolist.fixtures.buildTodoList
-import com.alo.cqrs.todolist.infrastructure.cqrs.store.InMemoryEventStore
-import com.alo.cqrs.todolist.infrastructure.cqrs.store.SerializedEvent
+import com.alo.cqrs.todolist.infrastructure.cqrs.InMemoryEventStore
+import com.alo.cqrs.todolist.infrastructure.cqrs.SerializedEvent
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
@@ -29,14 +29,14 @@ class TodoListInMemoryEventSourcedRepositoryTest {
         val domainEvent = TodoListCreated(uuid, "My todo list")
         val event = SerializedEvent(
             payload = objectMapper.writeValueAsString(domainEvent),
-            clazz = domainEvent::class.java
+            type = domainEvent::class.simpleName!!
         )
-        every { eventStore.load(uuid) } returns listOf(event)
+        every { eventStore.read(uuid) } returns listOf(event)
 
         val todoList = repository.get(TodoListId(uuid))
 
         assertThat(todoList).isEqualTo(
-            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, listOf(domainEvent))
+            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, emptyList())
         )
     }
 
@@ -48,7 +48,7 @@ class TodoListInMemoryEventSourcedRepositoryTest {
 
         repository.save(todoList)
 
-        val event = SerializedEvent(objectMapper.writeValueAsString(domainEvent), TodoListCreated::class.java)
-        verify { eventStore.store(uuid, listOf(event)) }
+        val event = SerializedEvent(objectMapper.writeValueAsString(domainEvent), TodoListCreated::class.simpleName!!)
+        verify { eventStore.write(uuid, listOf(event)) }
     }
 }
