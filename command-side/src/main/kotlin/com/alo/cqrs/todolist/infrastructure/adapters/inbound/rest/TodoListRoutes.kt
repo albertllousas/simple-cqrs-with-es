@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 
 private val logger = LoggerFactory.getLogger("Route.totoLists")
 
-fun Route.totoLists(commandBus: CommandBus) = route("/todo-lists") {
+fun Route.todoLists(commandBus: CommandBus) = route("/todo-lists") {
     post {
         val request = call.receive<CreateTodoListHttpRequest>()
         commandBus.safeDispatch(Command.CreateTodoList(name = request.name))
