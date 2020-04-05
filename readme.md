@@ -267,6 +267,11 @@ Package structure for command-side:
 
 // TODO
 
+
+## Lessons learned
+
+CQRS, when you apply all the patterns, is not easy at all, it is complex and takes time to understand.
+
 ## Related links
 
 - [CQRS](http://www.cqrs.nu/)

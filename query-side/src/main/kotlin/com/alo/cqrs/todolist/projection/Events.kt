@@ -1,2 +1,7 @@
 package com.alo.cqrs.todolist.projection
 
+import java.util.UUID
+
+sealed class Event()
+
+data class TodoListCreated(val id: UUID, val name: String): Event()
