@@ -224,7 +224,7 @@ If we think about it, there is no domain modeling or business involved here, it 
 Having said that, the query side should be as lean/thin as we can.
 
 Since views/projections are isolated, meaning that they can be accessed and updated without any other dependency than
- the stream of event and the storage, a simple [package-by-feature] would be a good way to structure the project.
+ the stream of event and the storage, a simple [package-by-feature](http://www.codingthearchitecture.com/2015/03/08/package_by_component_and_architecturally_aligned_testing.html) would be a good way to structure the project.
  
 Architecturally, query side would be:
 
