@@ -188,7 +188,7 @@ This restriction has some implications in the design:
 These are the events that we will handle: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
 
 
-### Fitting everything in hexagonal architecture
+### Fitting command-side in hexagonal architecture
 
 Till now we have CQRS, DDD and event-sourcing, but now we have to fit everything over an architectural pattern, and
  in our case it is hexagonal architecture, check this [other repo on my github](https://github.com/albertllousas/implementing-hexagonal-architecture) for a detailed explanation of the
@@ -205,6 +205,31 @@ And now let's focus in our problem (only command-side):
 
 <p align="center">
   <img src="misc/cqrs-hexa-2.png"  width="95%"/>
+</p> 
+
+### Simple Query-side
+
+Hexagonal architecture is a domain-centric architectural pattern, but since query side does not have
+ domain or any business logic, do we need an hexagonal approach? 
+
+Query side, as CQRS trend advocates to, should be as thin as possible, getting as close to the data store as possible.
+
+So, what are the responsibilities of the query side? 
+
+1. Read [projections](http://cqrs.wikidot.com/doc:projection), using event handlers
+2. Update [projections](http://cqrs.wikidot.com/doc:projection), using query handlers
+ 
+If we think about it, there is no domain modeling or business involved here, it is just update and read views.
+
+Having said that, the query side should be as lean/thin as we can.
+
+Since views/projections are isolated, meaning that they can be accessed and updated without any other dependency than
+ the stream of event and the storage, a simple [package-by-feature] would be a good way to structure the project.
+ 
+Architecturally, query side would be:
+
+<p align="center">
+  <img src="misc/query-side.png"  width="65%"/>
 </p> 
 
 ### Package structure

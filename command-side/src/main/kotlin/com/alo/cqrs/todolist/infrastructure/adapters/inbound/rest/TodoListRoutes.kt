@@ -1,4 +1,4 @@
-package com.alo.cqrs.todolist.infrastructure.adapters.inbound.ktor
+package com.alo.cqrs.todolist.infrastructure.adapters.inbound.rest
 
 import com.alo.cqrs.todolist.domain.model.Command
 import com.alo.cqrs.todolist.infrastructure.cqrs.CommandBus

@@ -37,10 +37,10 @@ class InMemoryEventStoreIntegrationTest {
             payload = objectMapper.writeValueAsString(domainEvent),
             type = domainEvent::class.java.simpleName!!
         )
-        val callback = mockk<(SerializedEvent)->Unit>(relaxed = true)
+        val callback = mockk<(String, String)->Unit>(relaxed = true)
 
         eventStore.subscribe(Subscription(callback)).also { eventStore.write(aggregateId, listOf(event)) }
 
-        verify { callback.invoke(event) }
+        verify { callback.invoke(event.type, event.payload) }
     }
 }

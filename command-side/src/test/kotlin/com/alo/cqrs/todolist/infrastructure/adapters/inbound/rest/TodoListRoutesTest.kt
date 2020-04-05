@@ -1,6 +1,8 @@
-package com.alo.cqrs.todolist.infrastructure.adapters.inbound.ktor
+package com.alo.cqrs.todolist.infrastructure.adapters.inbound.rest
 
 import com.alo.cqrs.todolist.domain.model.Command
+import com.alo.cqrs.todolist.infrastructure.adapters.inbound.rest.CreateTodoListHttpRequest
+import com.alo.cqrs.todolist.infrastructure.adapters.inbound.rest.totoLists
 import com.alo.cqrs.todolist.infrastructure.cqrs.CommandBus
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.install

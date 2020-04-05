@@ -26,8 +26,8 @@ class InMemoryEventStore {
 
     }
 
-    private fun publish(serializedEvent: SerializedEvent) {
-        subscribers.forEach { it.trigger(serializedEvent) }
+    private fun publish(event: SerializedEvent) {
+        subscribers.forEach { it.trigger(event.type, event.payload) }
     }
 
     fun subscribe(subscription: Subscription) = subscribers.add(subscription)
@@ -39,4 +39,4 @@ data class SerializedEvent(
     val type: String
 )
 
-data class Subscription(val trigger: (SerializedEvent) -> Unit)
+data class Subscription(val trigger: (String, String) -> Unit)
