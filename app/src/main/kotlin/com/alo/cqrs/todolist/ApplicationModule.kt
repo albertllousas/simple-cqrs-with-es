@@ -1,4 +1,4 @@
-package com.bank.transfers.infrastructure.config
+package com.alo.cqrs.todolist
 
 import com.alo.cqrs.todolist.application.CreateTodoListCommandHandler
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList

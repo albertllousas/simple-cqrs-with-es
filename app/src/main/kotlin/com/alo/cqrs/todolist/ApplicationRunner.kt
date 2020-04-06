@@ -1,4 +1,4 @@
-package com.bank.transfers.infrastructure.config
+package com.alo.cqrs.todolist
 
 import io.ktor.application.Application
 import io.ktor.server.engine.embeddedServer

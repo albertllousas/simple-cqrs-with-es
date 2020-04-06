@@ -232,12 +232,12 @@ Architecturally, query side would be:
   <img src="misc/query-side.png"  width="65%"/>
 </p> 
 
-### Package structure
+### Project structure
 
 The project has been split in three different modules:
 - `command-side`: All the write side code
 - `query-side`: read side code
-- `app`: Wiring up and app runner
+- `app`: Wiring up, app runner and [acceptance tests](./app/src/test/kotlin/com/alo/cqrs/todolist/acceptance/CreateTodoListAcceptanceTest.kt)
 
 Projects follow the Hexagonal architecture with this packaging:
 
@@ -263,10 +263,26 @@ Package structure for command-side:
 ```shell
 ./gradlew test
 ```
-## Run the app
 
-// TODO
+## Running the app
 
+Build the app $ run it:
+```shell
+./gradlew build
+java -jar 
+java -jar app/build/libs/app-all.jar
+```
+Send a create todo-list in the command side:
+```shell
+curl -X POST http://localhost:8080/todo-lists  \
+  -H 'Content-Type: application/json' \
+  -d '{"id": "77a9d273-441c-4ca6-a493-f617df6b5a23", "name": "my todo list"}'
+```
+Read the created projection in the read side:
+```shell
+curl http://localhost:8080/todo-lists/77a9d273-441c-4ca6-a493-f617df6b5a23/details 
+{"id":"77a9d273-441c-4ca6-a493-f617df6b5a23","name":"my todo list","status":"TODO","tasks":[]}% 
+```
 
 ## Lessons learned
 

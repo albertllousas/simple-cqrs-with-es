@@ -11,7 +11,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "com.alo.cqrs.orders.AppKt"
+    mainClassName = "com.alo.cqrs.todolist.ApplicationRunnerKt"
 }
 
 tasks.withType<Jar> {

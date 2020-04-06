@@ -1,6 +1,6 @@
 package com.alo.cqrs.todolist.acceptance
 
-import com.bank.transfers.infrastructure.config.module
+import com.alo.cqrs.todolist.module
 import io.ktor.application.Application
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
