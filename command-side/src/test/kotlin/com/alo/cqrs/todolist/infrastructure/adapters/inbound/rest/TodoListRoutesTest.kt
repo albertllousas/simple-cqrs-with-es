@@ -19,6 +19,7 @@ import io.mockk.just
 import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class TodoListRoutesTest {
 
@@ -29,8 +30,8 @@ class TodoListRoutesTest {
     @Test
     fun `should accept to create a todo-list`(): Unit =
         withTestApp {
-            val request = CreateTodoListHttpRequest("my daily tasks")
-            coEvery { commandBus.dispatch(Command.CreateTodoList(request.name)) } just Runs
+            val request = CreateTodoListHttpRequest(UUID.randomUUID(), "my daily tasks")
+            coEvery { commandBus.dispatch(Command.CreateTodoList(request.id, request.name)) } just Runs
 
             val call = handleRequest(HttpMethod.Post, "/todo-lists") {
                 addHeader("Content-Type", "application/json")
@@ -43,8 +44,10 @@ class TodoListRoutesTest {
     @Test
     fun `should accept to create a todo-list when dispatch command fails`(): Unit =
         withTestApp {
-            val request = CreateTodoListHttpRequest("my daily tasks")
-            coEvery { commandBus.dispatch(Command.CreateTodoList(request.name)) } coAnswers { throw Exception("Boom!") }
+            val request = CreateTodoListHttpRequest(UUID.randomUUID(), "my daily tasks")
+            coEvery {
+                commandBus.dispatch(Command.CreateTodoList(request.id, request.name))
+            } coAnswers { throw Exception("Boom!") }
 
             val call = handleRequest(HttpMethod.Post, "/todo-lists") {
                 addHeader("Content-Type", "application/json")

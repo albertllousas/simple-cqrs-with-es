@@ -13,18 +13,22 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import java.util.UUID
 
 private val logger = LoggerFactory.getLogger("Route.totoLists")
 
 fun Route.todoLists(commandBus: CommandBus) = route("/todo-lists") {
     post {
         val request = call.receive<CreateTodoListHttpRequest>()
-        commandBus.safeDispatch(Command.CreateTodoList(name = request.name))
+        commandBus.safeDispatch(Command.CreateTodoList(id = request.id, name = request.name))
         call.respond(HttpStatusCode.Accepted)
     }
 }
 
-data class CreateTodoListHttpRequest(val name: String)
+data class CreateTodoListHttpRequest(
+    val id: UUID,
+    val name: String
+)
 
 private fun <T : Command> CommandBus.safeDispatch(command: T) {
     GlobalScope.launch(exceptionHandler) {

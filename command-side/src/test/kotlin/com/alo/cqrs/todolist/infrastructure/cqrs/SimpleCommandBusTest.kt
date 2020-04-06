@@ -10,6 +10,7 @@ import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class SimpleCommandBusTest {
 
@@ -17,7 +18,7 @@ class SimpleCommandBusTest {
     fun `should dispatch a command to the specific handler`() = runBlocking {
         val commandHandler = mockk<CommandHandler<Command.CreateTodoList>>()
         val commandBus: CommandBus = SimpleCommandBus().register(commandHandler)
-        val command = Command.CreateTodoList("my list")
+        val command = Command.CreateTodoList(UUID.randomUUID(), "my list")
         every { commandHandler.handle(command) } just Runs
 
         commandBus.dispatch(command)
@@ -29,7 +30,7 @@ class SimpleCommandBusTest {
     fun `should fail dispatching a command when there is no handler registered`() {
         assertThatThrownBy {
             runBlocking {
-                SimpleCommandBus().dispatch(Command.CreateTodoList(name = "my todo list"))
+                SimpleCommandBus().dispatch(Command.CreateTodoList(UUID.randomUUID(), "my todo list"))
             }
         }.isInstanceOf(CommandHandlerNotRegisteredException::class.java)
             .hasMessageContaining("No CommandHandler registered to handle CreateTodoList")

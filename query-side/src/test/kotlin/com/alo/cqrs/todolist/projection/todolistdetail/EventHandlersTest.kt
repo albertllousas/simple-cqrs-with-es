@@ -1,6 +1,6 @@
 package com.alo.cqrs.todolist.projection.todolistdetail
 
-import com.alo.cqrs.todolist.projection.FakeDataStore
+import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.TodoListCreated
 import io.mockk.mockk
 import io.mockk.verify
@@ -12,7 +12,7 @@ import java.util.UUID
 
 class EventHandlersTest {
 
-    private val fakeDataStore = mockk<FakeDataStore>(relaxed = true)
+    private val fakeDataStore = mockk<FakeProjectionsDataStore>(relaxed = true)
 
     @Nested
     @DisplayName("Tests for 'TodoListCreated' event handler")

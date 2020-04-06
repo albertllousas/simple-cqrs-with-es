@@ -3,7 +3,7 @@ package com.alo.cqrs.todolist.projection
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListDetailDto
 import java.util.UUID
 
-class FakeDataStore {
+class FakeProjectionsDataStore {
 
     private val details = mutableMapOf<UUID, TodoListDetailDto>()
 

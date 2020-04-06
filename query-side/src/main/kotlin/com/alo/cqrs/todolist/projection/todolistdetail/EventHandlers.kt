@@ -1,10 +1,10 @@
 package com.alo.cqrs.todolist.projection.todolistdetail
 
-import com.alo.cqrs.todolist.projection.FakeDataStore
+import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.TodoListCreated
 
 class TodoListCreatedEventHandler(
-    private val datastore: FakeDataStore
+    private val datastore: FakeProjectionsDataStore
 ) {
     fun handle(event: TodoListCreated) {
         datastore.save(

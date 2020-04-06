@@ -19,23 +19,16 @@ class CreateTodoListCommandHandlerTest {
 
     private val repository = mockk<Repository<TodoList, TodoListId>>(relaxed = true)
 
-    private val generateId = mockk<() -> UUID>()
-
-    private val createTodoListCommandHandler = CreateTodoListCommandHandler(
-        repository = repository,
-        generateId = generateId
-    )
+    private val createTodoListCommandHandler = CreateTodoListCommandHandler(repository)
 
     @Test
     fun `should handle the creation of a new todo-list`() {
-        val command = Command.CreateTodoList(name = "my todo list")
-        val uuid = UUID.randomUUID()
-        every { generateId.invoke() } returns uuid
+        val command = Command.CreateTodoList(id= UUID.randomUUID(), name = "my todo list")
 
         createTodoListCommandHandler.handle(command)
 
         val expected = buildTodoList(
-            TodoListId(uuid), command.name, listOf(TodoListCreated(uuid, command.name))
+            TodoListId(command.id), command.name, listOf(TodoListCreated(command.id, command.name))
         )
         verify { repository.save(expected) }
     }

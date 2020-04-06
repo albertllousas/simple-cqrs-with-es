@@ -1,10 +1,8 @@
 package com.alo.cqrs.todolist.projection.todolistdetail
 
-import com.alo.cqrs.todolist.projection.FakeDataStore
-import com.alo.cqrs.todolist.projection.TodoListCreated
+import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -13,7 +11,7 @@ import java.util.UUID
 
 class QueryHandlersTest {
 
-    private val fakeDataStore = mockk<FakeDataStore>(relaxed = true)
+    private val fakeDataStore = mockk<FakeProjectionsDataStore>(relaxed = true)
 
     @Nested
     @DisplayName("Tests for 'TodoListCreated' event handler")

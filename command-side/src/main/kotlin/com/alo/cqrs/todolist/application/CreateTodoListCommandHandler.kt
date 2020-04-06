@@ -8,12 +8,11 @@ import com.alo.cqrs.todolist.domain.ports.outbound.Repository
 import java.util.UUID
 
 class CreateTodoListCommandHandler(
-    private val repository: Repository<TodoList, TodoListId>,
-    private val generateId: () -> UUID = { UUID.randomUUID() }
+    private val repository: Repository<TodoList, TodoListId>
 ) : CommandHandler<CreateTodoList> {
 
     override fun handle(command: CreateTodoList) =
-        TodoList.Factory.create(id = TodoListId(generateId()), name = command.name)
+        TodoList.Factory.create(id = TodoListId(command.id), name = command.name)
             .let(repository::save)
 
 }
