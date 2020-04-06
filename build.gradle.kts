@@ -39,6 +39,7 @@ subprojects {
             exclude(group = "com.sun.xml.bind", module = "jaxb-osgi")
         }
         testImplementation("com.github.javafaker:javafaker:1.0.1")
+        testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.17.0")
     }
 
     tasks.apply {

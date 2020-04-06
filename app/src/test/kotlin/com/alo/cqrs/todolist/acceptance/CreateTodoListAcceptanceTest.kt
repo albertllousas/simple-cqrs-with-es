@@ -7,8 +7,10 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class CreateTodoListAcceptanceTest {
     private lateinit var server: ApplicationEngine
@@ -27,39 +29,50 @@ class CreateTodoListAcceptanceTest {
         Runtime.getRuntime().addShutdownHook(Thread { server.stop(0, 0) })
     }
 
-//    @Test
-//    fun `should move money from one customer to another`() {
-//
-//        RestAssured
-//            .given()
-//            .contentType(ContentType.JSON)
-//            .body(
-//                """
-//					{
-//						"amount": 10.00,
-//                        "from": "fd1096fb-a7c5-46de-8433-e1b8c3db1ed5",
-//                        "to": "b6b473da-2d0f-41c9-ac4a-89a08a05ab36"
-//					}
-//				"""
-//            )
-//            .`when`()
-//            .port(appPort)
-//            .post("/transfers")
-//            .then()
-//            .assertThat()
-//            .statusCode(201)
-//            .extract()
-//            .response()
-//            .also {
-////                assertThatJson(it.body.asString()).isEqualTo(
-////                    """
-////					{
-////					  "total": 24.00
-////					}
-////					"""
-////                )
-//            }
-//
-//    }
+    @Test
+    fun `should create a todo list with a command and read the projection details`() {
+        val id = UUID.randomUUID()
+
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(
+                """
+					{
+						"id": "$id",
+                        "name": "my todo list"
+					}
+				"""
+            )
+            .`when`()
+            .port(appPort)
+            .post("/todo-lists")
+            .then()
+            .assertThat()
+            .statusCode(202)
+
+        RestAssured
+            .`when`()
+            .get("/todo-lists/$id/details")
+            .then()
+            .assertThat()
+            .statusCode(200)
+
+            .extract()
+            .response()
+            .also {
+                assertThatJson(it.body.asString()).isEqualTo(
+                    """
+					{
+                        "id":"$id",
+                        "name":"my todo list",
+                        "status":"TODO",
+                        "tasks":[]
+                    }
+					"""
+                )
+            }
+
+    }
 
 }
