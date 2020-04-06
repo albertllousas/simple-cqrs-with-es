@@ -8,11 +8,7 @@ class TodoListCreatedEventHandler(
 ) {
     fun handle(event: TodoListCreated) {
         datastore.save(
-            TodoListDetailDto(
-                id = event.id,
-                name = event.name,
-                status = Status.TODO,
-                tasks = emptyList()
+            TodoListDetailDto(id = event.id, name = event.name, status = Status.TODO, tasks = emptyList()
             )
         )
     }

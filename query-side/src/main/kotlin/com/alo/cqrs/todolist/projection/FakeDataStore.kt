@@ -11,4 +11,6 @@ class FakeDataStore {
         details[todoListDetailDto.id] = todoListDetailDto
     }
 
+    fun get(id: UUID): TodoListDetailDto? = details[id]
+
 }
