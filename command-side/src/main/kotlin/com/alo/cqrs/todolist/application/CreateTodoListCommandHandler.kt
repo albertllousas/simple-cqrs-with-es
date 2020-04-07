@@ -12,7 +12,7 @@ class CreateTodoListCommandHandler(
 ) : CommandHandler<CreateTodoList> {
 
     override fun handle(command: CreateTodoList) =
-        TodoList.Factory.create(id = TodoListId(command.id), name = command.name)
+        TodoList.Factory.create(id = TodoListId(command.aggregateId), name = command.name)
             .let(repository::save)
 
 }

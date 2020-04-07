@@ -36,7 +36,7 @@ class TodoListInMemoryEventSourcedRepositoryTest {
         val todoList = repository.get(TodoListId(uuid))
 
         assertThat(todoList).isEqualTo(
-            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, emptyList())
+            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, emptyList(), emptyList())
         )
     }
 

@@ -23,12 +23,16 @@ class CreateTodoListCommandHandlerTest {
 
     @Test
     fun `should handle the creation of a new todo-list`() {
-        val command = Command.CreateTodoList(id= UUID.randomUUID(), name = "my todo list")
+        val command = Command.CreateTodoList(aggregateId = UUID.randomUUID(), name = "my todo list")
 
         createTodoListCommandHandler.handle(command)
 
         val expected = buildTodoList(
-            TodoListId(command.id), command.name, listOf(TodoListCreated(command.id, command.name))
+            TodoListId(command.aggregateId),
+            command.name,
+            emptyList(),
+            listOf(TodoListCreated(command.aggregateId, command.name)
+            )
         )
         verify { repository.save(expected) }
     }

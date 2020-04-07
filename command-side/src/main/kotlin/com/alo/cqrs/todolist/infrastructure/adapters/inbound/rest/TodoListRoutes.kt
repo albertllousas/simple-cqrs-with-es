@@ -20,7 +20,7 @@ private val logger = LoggerFactory.getLogger("Route.totoLists")
 fun Route.todoLists(commandBus: CommandBus) = route("/todo-lists") {
     post {
         val request = call.receive<CreateTodoListHttpRequest>()
-        commandBus.safeDispatch(Command.CreateTodoList(id = request.id, name = request.name))
+        commandBus.safeDispatch(Command.CreateTodoList(aggregateId = request.id, name = request.name))
         call.respond(HttpStatusCode.Accepted)
     }
 }
