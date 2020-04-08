@@ -1,5 +1,6 @@
 package com.alo.cqrs.todolist
 
+import com.alo.cqrs.todolist.application.AddTaskCommandHandler
 import com.alo.cqrs.todolist.application.CreateTodoListCommandHandler
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
@@ -13,6 +14,7 @@ import com.alo.cqrs.todolist.projection.EventConsumer
 import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.QueryHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.GetTodoListDetailsQuery
+import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListDetailDto
 import com.alo.cqrs.todolist.projection.todolistdetail.todoListDetails
@@ -31,12 +33,16 @@ fun Application.module() {
     val eventStore = InMemoryEventStore()
     val todoListRepository: Repository<TodoList, TodoListId> = TodoListInMemoryEventSourcedRepository(eventStore)
     val createTodoListCommandHandler = CreateTodoListCommandHandler(todoListRepository)
-    val commandBus = SimpleCommandBus().register(createTodoListCommandHandler)
+    val addTaskCommandHandler = AddTaskCommandHandler(todoListRepository)
+    val commandBus = SimpleCommandBus()
+        .register(createTodoListCommandHandler)
+        .register(addTaskCommandHandler)
     //read-side wiring
     val fakeDataStore = FakeProjectionsDataStore()
     val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?> = GetTodoListDetailsQuery(fakeDataStore)
     val todoListCreatedEventHandler = TodoListCreatedEventHandler(fakeDataStore)
-    val eventConsumer = EventConsumer(todoListCreatedEventHandler)
+    val taskAddedEventHandler = TaskAddedEventHandler(fakeDataStore)
+    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler)
     eventStore.subscribe(Subscription(eventConsumer::receive))
 
     install(DefaultHeaders)

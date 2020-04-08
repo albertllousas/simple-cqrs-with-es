@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class CreateTodoListAcceptanceTest {
+class AddTaskAcceptanceTest {
     private lateinit var server: ApplicationEngine
 
     private val appPort = 8080
@@ -30,7 +30,7 @@ class CreateTodoListAcceptanceTest {
     }
 
     @Test
-    fun `should create a todo list and read the projection details`() {
+    fun `should add a task to an existent todo list and read the projection details`() {
         val id = UUID.randomUUID()
 
         RestAssured
@@ -52,6 +52,23 @@ class CreateTodoListAcceptanceTest {
             .statusCode(202)
 
         RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(
+                """
+					{
+                        "name": "my task"
+					}
+				"""
+            )
+            .`when`()
+            .port(appPort)
+            .post("/todo-lists/$id/tasks")
+            .then()
+            .assertThat()
+            .statusCode(202)
+
+        RestAssured
             .`when`()
             .get("/todo-lists/$id/details")
             .then()
@@ -61,13 +78,21 @@ class CreateTodoListAcceptanceTest {
             .extract()
             .response()
             .also {
-                assertThatJson(it.body.asString()).isEqualTo(
+                assertThatJson(it.body.asString())
+                    .whenIgnoringPaths("tasks[*].id") // task id is generated in command-side module
+                    .isEqualTo(
                     """
 					{
                         "id":"$id",
                         "name":"my todo list",
                         "status":"TODO",
-                        "tasks":[]
+                        "tasks":[
+                            {
+                                "id": "ignored",
+                                "name": "my task",
+                                "status":"TODO"
+                            }
+                        ]
                     }
 					"""
                 )

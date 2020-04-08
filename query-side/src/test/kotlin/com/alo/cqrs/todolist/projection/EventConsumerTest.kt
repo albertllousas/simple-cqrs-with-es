@@ -1,5 +1,6 @@
 package com.alo.cqrs.todolist.projection
 
+import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.mockk
@@ -14,8 +15,11 @@ class EventConsumerTest {
 
     private val todoListCreatedEventHandler = mockk<TodoListCreatedEventHandler>(relaxed = true)
 
+    private val taskAddedEventHandler = mockk<TaskAddedEventHandler>(relaxed = true)
+
     private val eventConsumer = EventConsumer(
-        todoListCreatedEventHandler = todoListCreatedEventHandler
+        todoListCreatedEventHandler = todoListCreatedEventHandler,
+        taskAddedEventHandler = taskAddedEventHandler
     )
 
     @Test
@@ -25,6 +29,15 @@ class EventConsumerTest {
         eventConsumer.receive("TodoListCreated", objectMapper.writeValueAsString(event))
 
         verify { todoListCreatedEventHandler.handle(event) }
+    }
+
+    @Test
+    fun `should receive and dispatch 'TaskAdded' event to the handler`() {
+        val event = TaskAdded(UUID.randomUUID(), UUID.randomUUID(), "my task")
+
+        eventConsumer.receive("TaskAdded", objectMapper.writeValueAsString(event))
+
+        verify { taskAddedEventHandler.handle(event) }
     }
 
     @Test
