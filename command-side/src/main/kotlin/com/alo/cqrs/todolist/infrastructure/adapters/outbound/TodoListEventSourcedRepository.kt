@@ -1,6 +1,5 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.outbound
 
-import com.alo.cqrs.todolist.domain.model.DeserializationEventException
 import com.alo.cqrs.todolist.domain.model.DomainEvent
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListEvent
@@ -9,6 +8,7 @@ import com.alo.cqrs.todolist.domain.ports.outbound.Repository
 import com.alo.cqrs.todolist.infrastructure.cqrs.InMemoryEventStore
 import com.alo.cqrs.todolist.infrastructure.cqrs.SerializedEvent
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotlin.reflect.KClass
 
 class TodoListInMemoryEventSourcedRepository(
     private val eventStore: InMemoryEventStore
@@ -35,3 +35,7 @@ class TodoListInMemoryEventSourcedRepository(
             ?: throw DeserializationEventException(TodoListEvent::class, type)
 
 }
+
+class DeserializationEventException(eventClass: KClass<out DomainEvent>, typeToParse: String) : Exception(
+    "Impossible to deserialize event type '$typeToParse' to any of '${eventClass.sealedSubclasses}' "
+)

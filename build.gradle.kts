@@ -13,6 +13,7 @@ allprojects {
 }
 
 val ktorVersion = "1.3.2"
+val arrowVersion = "0.10.4"
 
 subprojects {
     apply(plugin = "java")
@@ -29,6 +30,7 @@ subprojects {
         implementation("io.ktor:ktor-server-netty:$ktorVersion")
         implementation("io.ktor:ktor-jackson:$ktorVersion")
         implementation("ch.qos.logback:logback-classic:1.2.3")
+        implementation("io.arrow-kt:arrow-core:$arrowVersion")
 
         testImplementation("org.assertj:assertj-core:3.15.0")
         testImplementation("io.mockk:mockk:1.9.3")

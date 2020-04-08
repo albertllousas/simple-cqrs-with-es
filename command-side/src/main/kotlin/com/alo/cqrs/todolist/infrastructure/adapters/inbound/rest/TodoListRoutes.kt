@@ -19,11 +19,24 @@ private val logger = LoggerFactory.getLogger("Route.totoLists")
 
 fun Route.todoLists(commandBus: CommandBus) = route("/todo-lists") {
     post {
-        val request = call.receive<CreateTodoListHttpRequest>()
-        commandBus.safeDispatch(Command.CreateTodoList(aggregateId = request.id, name = request.name))
-        call.respond(HttpStatusCode.Accepted)
+        call.receive<CreateTodoListHttpRequest>()
+            .let { Command.CreateTodoList(aggregateId = it.id, name = it.name) }
+            .let(commandBus::safeDispatch)
+            .let { call.respond(HttpStatusCode.Accepted) }
+    }
+
+    post("/{id}/tasks") {
+        Pair(call.parameters["id"], call.receive<AddTaskHttpRequest>())
+            .let { (todoListId, payload) -> Command.AddTask(UUID.fromString(todoListId), payload.name) }
+            .let(commandBus::safeDispatch)
+            .let { call.respond(HttpStatusCode.Accepted) }
     }
 }
+
+data class AddTaskHttpRequest(
+    val name: String
+)
+
 
 data class CreateTodoListHttpRequest(
     val id: UUID,

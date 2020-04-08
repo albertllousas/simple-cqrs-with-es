@@ -2,11 +2,8 @@ package com.alo.cqrs.todolist.domain.model.todolist
 
 import com.alo.cqrs.todolist.domain.model.AggregateId
 import com.alo.cqrs.todolist.domain.model.AggregateRoot
-import com.alo.cqrs.todolist.domain.model.AggregateRootFactory
-import com.alo.cqrs.todolist.domain.model.CreationEvent
 import com.alo.cqrs.todolist.domain.model.DomainEvent
 import com.alo.cqrs.todolist.domain.model.UnsupportedEventException
-import com.alo.cqrs.todolist.domain.model.tail
 import java.util.UUID
 
 data class TodoListId(override val value: UUID) : AggregateId()
@@ -29,7 +26,7 @@ data class TodoList private constructor(
             uncommittedChanges = this.uncommittedChanges + listOf(event)
         )
 
-    companion object Factory : AggregateRootFactory<TodoList>() {
+    companion object Factory {
 
         fun create(id: TodoListId, name: String): TodoList =
             TodoList(id, name, tasks = emptyList(), uncommittedChanges = listOf(TodoListCreated(id.value, name)))
@@ -37,19 +34,11 @@ data class TodoList private constructor(
         fun restoreState(id: TodoListId, name: String, tasks: List<Task>, uncommittedChanges: List<DomainEvent>): TodoList =
             TodoList(id, name, tasks, uncommittedChanges)
 
-//        make it compile, commit and try with arrow folds just here
-
-//        maybe with map and accumulator, with arrow and fold? or how it was before?
-
-        override fun recreate(history: List<DomainEvent>): TodoList =
-            recreate(
-                history = history,
-                createAggregate = { event: TodoListCreated ->
-                    TodoList(TodoListId(event.id), event.name, emptyList(), emptyList())
-                },
-                applyChange = this::apply,
-                clearUncommittedChanges = { todoList -> todoList.copy(uncommittedChanges = emptyList()) }
-            )
+        fun recreate(history: List<DomainEvent>):TodoList {
+            val creationEvent = history.first() as TodoListCreated
+            val initial = create(TodoListId(creationEvent.id), creationEvent.name)
+            return history.foldRight(initial, this::apply).copy(uncommittedChanges = emptyList())
+        }
 
         private fun apply(event: DomainEvent, currentState: TodoList): TodoList =
             if (event is TodoListEvent)

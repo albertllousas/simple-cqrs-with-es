@@ -1,5 +1,6 @@
 package com.alo.cqrs.todolist.domain.model
 
+import java.util.UUID
 import kotlin.reflect.KClass
 
 class UnsupportedEventException(
@@ -7,9 +8,7 @@ class UnsupportedEventException(
     eventClass: KClass<out DomainEvent>
 ) : Exception("Unsupported event '${eventClass.simpleName}' for aggregate root '${aggregateClass.simpleName}' ")
 
-class DeserializationEventException(
-    eventClass: KClass<out DomainEvent>,
-    typeToParse: String
-) : Exception(
-    "Impossible to deserialize event type '$typeToParse' to any of '${eventClass.sealedSubclasses}' "
+class AggregateNotFoundException(aggregateClass: KClass<out AggregateRoot>, id: UUID) : Exception(
+    "Aggregate root '${aggregateClass.simpleName}' with id '$id' not found"
 )
+

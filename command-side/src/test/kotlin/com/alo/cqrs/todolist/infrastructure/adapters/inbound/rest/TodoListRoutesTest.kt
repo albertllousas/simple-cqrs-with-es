@@ -57,6 +57,21 @@ class TodoListRoutesTest {
             Assertions.assertThat(call.response.status()).isEqualTo(HttpStatusCode.Accepted)
         }
 
+    @Test
+    fun `should accept to create a task`(): Unit =
+        withTestApp {
+            val todoListId = UUID.randomUUID()
+            val request = AddTaskHttpRequest("my task")
+            coEvery { commandBus.dispatch(Command.AddTask(todoListId, request.name)) } just Runs
+
+            val call = handleRequest(HttpMethod.Post, "/todo-lists/$todoListId/tasks") {
+                addHeader("Content-Type", "application/json")
+                setBody(objectMapper.writeValueAsString(request))
+            }
+
+            Assertions.assertThat(call.response.status()).isEqualTo(HttpStatusCode.Accepted)
+        }
+
     private fun withTestApp(callback: TestApplicationEngine.() -> Unit): Unit {
         withTestApplication({
             install(ContentNegotiation) { jackson {} }
