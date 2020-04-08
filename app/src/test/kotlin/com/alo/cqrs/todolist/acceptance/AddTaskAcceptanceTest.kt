@@ -81,7 +81,7 @@ class AddTaskAcceptanceTest {
                 assertThatJson(it.body.asString())
                     .whenIgnoringPaths("tasks[*].id") // task id is generated in command-side module
                     .isEqualTo(
-                    """
+                        """
 					{
                         "id":"$id",
                         "name":"my todo list",
@@ -95,7 +95,7 @@ class AddTaskAcceptanceTest {
                         ]
                     }
 					"""
-                )
+                    )
             }
 
     }

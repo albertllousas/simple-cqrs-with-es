@@ -285,7 +285,7 @@ com.alo.cqrs.todolist.projection
                         `-- QueryHandlers.kt // read views, no logic
 ```
 
-- `app`: Wiring up, app runner and [acceptance tests](./app/src/test/kotlin/com/alo/cqrs/todolist/acceptance/CreateTodoListAcceptanceTest.kt)
+- `app`: Wiring up, app runner and [acceptance tests](./app/src/test/kotlin/com/alo/cqrs/todolist/acceptance)
 ## tech stack
 
 * Language: Kotlin
