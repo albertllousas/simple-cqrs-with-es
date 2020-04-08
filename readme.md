@@ -235,19 +235,39 @@ Architecturally, query side would be:
 ### Project structure
 
 The project has been split in three different modules:
-- `command-side`: All the write side code
-- `query-side`: read side code
+- `command-side`: All the write side code, as previously explained, follows the hexagonal architecture:
+```kotlin
+com.alo.cqrs.todolist
+                `|-- application // use cases, the command handlers ,they implement the inbound ports
+                 |-- domain 
+                 |   |-- model // the heart of the hexagon
+                 |   |   `-- todolist // todolist domain
+                 |   `-- ports // boundaries of the hexagon
+                 |       |-- inbound // inbound/left/driver boundary
+                 |       `-- outbound // outbound/right/driven boundary  
+                 `-- infrastructure // outside world, all the I/O components UI, database, frameworks, devices, clients, etc.
+                     |-- adapters // translators between the domain and the infrastructure  
+                     |   |-- inbound // they call the inbound ports, also call primary actors
+                     |   |   |-- rest  // rest entry-points 
+                     |   |   `-- eventhandlers // listeners of event app that create commands (like SAGAs)
+                     |   `-- outbound // implementations of the outbound ports (repositories in our case)
+                     `-- cqrs // non-hexagonal components, like buses, eventstore...
+
+```
+
+- `query-side`: read side code, simple architecture, following feature-by-package:
+```kotlin
+com.alo.cqrs.todolist.projection
+                   `|-- EventConsumer.kt // subscriber to eventstore, dispatch changes to event-handlers
+                    |-- Events.kt //all posible events
+                    `-- todolistdetail // all components related to todolistdetail projection
+                        |-- Dtos.kt // views for
+                        |-- EventHandlers.kt // update views
+                        |-- HttpRoutes.kt // rest endpoints
+                        `-- QueryHandlers.kt // read views, no logic
+```
+
 - `app`: Wiring up, app runner and [acceptance tests](./app/src/test/kotlin/com/alo/cqrs/todolist/acceptance/CreateTodoListAcceptanceTest.kt)
-
-Projects follow the Hexagonal architecture with this packaging:
-
-- Application: Application Services (the use cases), in our case as command-handlers
-- Domain model: domain and ports
-- Infrastructure: Outside world, adapters and non-hexagonal components 
-
-Package structure for command-side:
-
-
 ## tech stack
 
 * Language: Kotlin
