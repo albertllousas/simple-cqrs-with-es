@@ -7,6 +7,24 @@ The following repository tries to describe a basic CQRS with Kotlin and Ktor as 
 
 Also, I am not an expert on the topic, not even a beginner, so this is a way to learn.
  
+ - [CQRS, event-sourcing, DDD and hexagonal architecture: Tracking order service](#cqrs--event-sourcing--ddd-and-hexagonal-architecture--tracking-order-service)
+   * [CQRS overview](#cqrs-overview)
+     + [App without CQRS](#app-without-cqrs)
+     + [Simple CQRS](#simple-cqrs)
+     + [CQRS with separate storage engines](#cqrs-with-separate-storage-engines)
+       - [Dual writes](#dual-writes)
+     + [CQRs with event sourcing](#cqrs-with-event-sourcing)
+   * [Simple todo-list Service](#simple-todo-list-service)
+     + [Domain model with DDD](#domain-model-with-ddd)
+     + [Event sourcing](#event-sourcing)
+     + [Fitting command-side in hexagonal architecture](#fitting-command-side-in-hexagonal-architecture)
+     + [Simple Query-side](#simple-query-side)
+     + [Project structure](#project-structure)
+   * [tech stack](#tech-stack)
+   * [Running tests](#running-tests)
+   * [Running the app](#running-the-app)
+   * [Lessons learned](#lessons-learned)
+   * [Related links](#related-links)
  
 ## CQRS overview
 
