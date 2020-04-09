@@ -16,6 +16,7 @@ import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.QueryHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.GetTodoListDetailsQuery
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
+import com.alo.cqrs.todolist.projection.todolistdetail.TaskCompletedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListDetailDto
 import com.alo.cqrs.todolist.projection.todolistdetail.todoListDetails
@@ -45,7 +46,8 @@ fun Application.module() {
     val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?> = GetTodoListDetailsQuery(fakeDataStore)
     val todoListCreatedEventHandler = TodoListCreatedEventHandler(fakeDataStore)
     val taskAddedEventHandler = TaskAddedEventHandler(fakeDataStore)
-    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler)
+    val taskCompletedEventHandler = TaskCompletedEventHandler(fakeDataStore)
+    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler, taskCompletedEventHandler)
     eventStore.subscribe(Subscription(eventConsumer::receive))
 
     install(DefaultHeaders)

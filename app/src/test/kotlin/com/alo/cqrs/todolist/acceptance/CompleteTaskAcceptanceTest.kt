@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class CreateTodoListAcceptanceTest {
+class CompleteTaskAcceptanceTest {
     private lateinit var server: ApplicationEngine
 
     private val appPort = RandomPort.get()
@@ -30,7 +30,7 @@ class CreateTodoListAcceptanceTest {
     }
 
     @Test
-    fun `should create a todo list and read the projection details`() {
+    fun `should complete a task to an existent todo list and read the projection details`() {
         val id = UUID.randomUUID()
 
         RestAssured
@@ -52,27 +52,72 @@ class CreateTodoListAcceptanceTest {
             .statusCode(202)
 
         RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .body(
+                """
+					{
+                        "name": "my task"
+					}
+				"""
+            )
+            .`when`()
+            .port(appPort)
+            .post("/todo-lists/$id/tasks")
+            .then()
+            .assertThat()
+            .statusCode(202)
+
+        val taskId:String  = RestAssured
             .`when`()
             .get("/todo-lists/$id/details")
             .then()
             .assertThat()
             .statusCode(200)
+            .extract()
+            .path("tasks[0].id")
 
+        RestAssured
+            .given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .port(appPort)
+            .put("/todo-lists/$id/tasks/$taskId/completed")
+            .then()
+            .assertThat()
+            .statusCode(202)
+
+        Thread.sleep(500) //TODO: add awaitability and remove sleep
+
+        RestAssured
+            .`when`()
+            .get("/todo-lists/$id/details")
+            .then()
+            .assertThat()
+            .statusCode(200)
             .extract()
             .response()
             .also {
-                assertThatJson(it.body.asString()).isEqualTo(
-                    """
+                assertThatJson(it.body.asString())
+                    .isEqualTo(
+                        """
 					{
                         "id":"$id",
                         "name":"my todo list",
                         "status":"TODO",
-                        "tasks":[]
+                        "tasks":[
+                            {
+                                "id": "$taskId",
+                                "name": "my task",
+                                "status":"DONE"
+                            }
+                        ]
                     }
 					"""
-                )
+                    )
             }
 
     }
+
 
 }

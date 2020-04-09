@@ -1,6 +1,7 @@
 package com.alo.cqrs.todolist.projection
 
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
+import com.alo.cqrs.todolist.projection.todolistdetail.TaskCompletedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.mockk
@@ -17,9 +18,12 @@ class EventConsumerTest {
 
     private val taskAddedEventHandler = mockk<TaskAddedEventHandler>(relaxed = true)
 
+    private val taskCompletedEventHandler = mockk<TaskCompletedEventHandler>(relaxed = true)
+
     private val eventConsumer = EventConsumer(
         todoListCreatedEventHandler = todoListCreatedEventHandler,
-        taskAddedEventHandler = taskAddedEventHandler
+        taskAddedEventHandler = taskAddedEventHandler,
+        taskCompletedEventHandler = taskCompletedEventHandler
     )
 
     @Test
@@ -41,12 +45,22 @@ class EventConsumerTest {
     }
 
     @Test
+    fun `should receive and dispatch 'TaskCompleted' event to the handler`() {
+        val event = TaskCompleted(UUID.randomUUID(), UUID.randomUUID())
+
+        eventConsumer.receive("TaskCompleted", objectMapper.writeValueAsString(event))
+
+        verify { taskCompletedEventHandler.handle(event) }
+    }
+
+    @Test
     fun `should fail when event received is not recognized and can not be parsed`() {
         assertThatThrownBy {
             eventConsumer.receive("NonExistentEvent", "payload")
         }.isInstanceOf(UnparseableEventException::class.java)
             .hasMessageContaining(
-                "Impossible to parse event type 'NonExistentEvent', only types '[TodoListCreated]' are accepted."
+                "Impossible to parse event type 'NonExistentEvent', only types '[TodoListCreated, TaskAdded, " +
+                    "TaskCompleted]' are allowed."
             )
     }
 }

@@ -42,7 +42,6 @@ class HttpRoutesTest {
     @Test
     fun `should not found a non existent todo-list details`(): Unit = withTestApp {
         val id = UUID.randomUUID()
-        val todoListDetailDto = TodoListDetailDto(id, "my todo list", TODO, emptyList())
         every { query(id) } returns null
 
         val call = handleRequest(HttpMethod.Get, "/todo-lists/$id/details") {

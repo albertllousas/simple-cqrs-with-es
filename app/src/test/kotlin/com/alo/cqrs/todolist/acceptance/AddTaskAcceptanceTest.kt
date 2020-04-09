@@ -15,12 +15,12 @@ import java.util.UUID
 class AddTaskAcceptanceTest {
     private lateinit var server: ApplicationEngine
 
-    private val appPort = 8080
+    private val appPort = RandomPort.get()
 
     @BeforeEach
     fun `set up`() {
         RestAssured.baseURI = "http://localhost"
-        RestAssured.port = 8080
+        RestAssured.port = appPort
         server = embeddedServer(
             factory = Netty,
             port = appPort,
@@ -74,7 +74,6 @@ class AddTaskAcceptanceTest {
             .then()
             .assertThat()
             .statusCode(200)
-
             .extract()
             .response()
             .also {
