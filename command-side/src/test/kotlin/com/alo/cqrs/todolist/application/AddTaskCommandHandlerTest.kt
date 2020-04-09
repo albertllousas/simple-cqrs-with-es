@@ -2,6 +2,7 @@ package com.alo.cqrs.todolist.application
 
 import com.alo.cqrs.todolist.domain.model.AggregateNotFoundException
 import com.alo.cqrs.todolist.domain.model.Command
+import com.alo.cqrs.todolist.domain.model.todolist.Status
 import com.alo.cqrs.todolist.domain.model.todolist.Task
 import com.alo.cqrs.todolist.domain.model.todolist.TaskAdded
 import com.alo.cqrs.todolist.domain.model.todolist.TaskId
@@ -42,7 +43,7 @@ class AddTaskCommandHandlerTest {
         val expected = buildTodoList(
             todoList.id,
             todoList.name,
-            listOf(Task(TaskId(staticTaskUuuid), command.name)),
+            listOf(Task(TaskId(staticTaskUuuid), command.name, Status.TODO)),
             listOf(TaskAdded(command.aggregateId, staticTaskUuuid, command.name)
             )
         )

@@ -9,3 +9,5 @@ sealed class TodoListEvent: DomainEvent()
 data class TodoListCreated(val id: UUID, val name: String): TodoListEvent(), CreationEvent
 
 data class TaskAdded(val aggregateId: UUID, val id: UUID, val name: String): TodoListEvent()
+
+data class TaskCompleted(val aggregateId: UUID, val id: UUID): TodoListEvent()

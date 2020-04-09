@@ -8,4 +8,6 @@ sealed class Command {
 
     data class AddTask(val aggregateId: UUID, val name: String) : Command()
 
+    data class CompleteTask(val aggregateId: UUID, val taskId: UUID) : Command()
+
 }

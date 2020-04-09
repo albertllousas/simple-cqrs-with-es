@@ -1,6 +1,7 @@
 package com.alo.cqrs.todolist
 
 import com.alo.cqrs.todolist.application.AddTaskCommandHandler
+import com.alo.cqrs.todolist.application.CompleteTaskCommandHandler
 import com.alo.cqrs.todolist.application.CreateTodoListCommandHandler
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
@@ -34,9 +35,11 @@ fun Application.module() {
     val todoListRepository: Repository<TodoList, TodoListId> = TodoListInMemoryEventSourcedRepository(eventStore)
     val createTodoListCommandHandler = CreateTodoListCommandHandler(todoListRepository)
     val addTaskCommandHandler = AddTaskCommandHandler(todoListRepository)
+    val completeTaskCommandHandler = CompleteTaskCommandHandler(todoListRepository)
     val commandBus = SimpleCommandBus()
         .register(createTodoListCommandHandler)
         .register(addTaskCommandHandler)
+        .register(completeTaskCommandHandler)
     //read-side wiring
     val fakeDataStore = FakeProjectionsDataStore()
     val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?> = GetTodoListDetailsQuery(fakeDataStore)

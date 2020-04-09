@@ -8,6 +8,7 @@ import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.post
+import io.ktor.routing.put
 import io.ktor.routing.route
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +29,15 @@ fun Route.todoLists(commandBus: CommandBus) = route("/todo-lists") {
     post("/{id}/tasks") {
         Pair(call.parameters["id"], call.receive<AddTaskHttpRequest>())
             .let { (todoListId, payload) -> Command.AddTask(UUID.fromString(todoListId), payload.name) }
+            .let(commandBus::safeDispatch)
+            .let { call.respond(HttpStatusCode.Accepted) }
+    }
+
+    put("/{todoListId}/tasks/{id}/completed") {
+        Pair(call.parameters["todoListId"], call.parameters["id"])
+            .let { (todoListId, taskId) ->
+                Command.CompleteTask(UUID.fromString(todoListId), UUID.fromString(taskId))
+            }
             .let(commandBus::safeDispatch)
             .let { call.respond(HttpStatusCode.Accepted) }
     }
