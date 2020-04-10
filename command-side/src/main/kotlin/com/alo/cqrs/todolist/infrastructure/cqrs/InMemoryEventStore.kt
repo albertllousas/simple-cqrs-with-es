@@ -1,10 +1,13 @@
 package com.alo.cqrs.todolist.infrastructure.cqrs
 
+import org.slf4j.LoggerFactory
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 
 
 class InMemoryEventStore {
+
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     private val storage: ConcurrentHashMap<UUID, List<SerializedEvent>> = ConcurrentHashMap()
 
@@ -22,7 +25,9 @@ class InMemoryEventStore {
 //            if (baseVersion !== oldValue[oldValue.size() - 1].getVersion()) {
 //                throw OptimisticLockingException("Base version does not match current stored version")
 //            }
-        }).also { events.forEach(::publish) }
+        })
+            .also { events.forEach { event -> logger.info("Event '$event' stored.")} }
+            .also { events.forEach(::publish) }
 
     }
 

@@ -38,7 +38,8 @@ class TodoListTest {
             val history = listOf(
                 TodoListCreated(todoListId.value, todoListName),
                 TaskAdded(todoListId.value, taskId.value, taskName),
-                TaskCompleted(todoListId.value, taskId.value)
+                TaskCompleted(todoListId.value, taskId.value),
+                TodoListCompleted(todoListId.value)
             )
 
             val todoList = TodoList.Factory.recreate(history)
@@ -47,6 +48,7 @@ class TodoListTest {
                 buildTodoList(
                     id = todoListId,
                     name = todoListName,
+                    status = DONE,
                     tasks = listOf(Task(taskId, taskName, DONE)),
                     uncommittedChanges = emptyList()
                 )
@@ -83,8 +85,9 @@ class TodoListTest {
         @Test
         fun `should complete a task`() {
             val completedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
-            val uncompletedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
-            val todoList = buildTodoList(tasks = listOf(completedTask, uncompletedTask))
+            val uncompletedTask = Task(TaskId(UUID.randomUUID()), "another", TODO)
+            val anotherUncompletedTask = Task(TaskId(UUID.randomUUID()), "more", TODO)
+            val todoList = buildTodoList(tasks = listOf(completedTask, uncompletedTask, anotherUncompletedTask))
 
             val result = todoList.completeTask(uncompletedTask.id)
 
@@ -93,7 +96,8 @@ class TodoListTest {
                 buildTodoList(
                     id = todoList.id,
                     name = todoList.name,
-                    tasks = listOf(completedTask, uncompletedTask.copy(status = DONE)),
+                    status = TODO,
+                    tasks = listOf(completedTask, uncompletedTask.copy(status = DONE), anotherUncompletedTask),
                     uncommittedChanges = todoList.uncommittedChanges + listOf(newEvent)
                 )
             )
@@ -116,6 +120,27 @@ class TodoListTest {
             val result = todoList.completeTask(TaskId(UUID.randomUUID()))
 
             assertThat(result).isEqualTo(todoList)
+        }
+
+        @Test
+        fun `should complete a todoList when all the tasks are alreasy completed`() {
+            val completedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
+            val uncompletedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
+            val todoList = buildTodoList(tasks = listOf(completedTask, uncompletedTask))
+
+            val result = todoList.completeTask(uncompletedTask.id)
+
+            val taskCompleted = TaskCompleted(todoList.id.value, uncompletedTask.id.value)
+            val todoListCompleted = TodoListCompleted(todoList.id.value)
+            assertThat(result).isEqualTo(
+                buildTodoList(
+                    id = todoList.id,
+                    name = todoList.name,
+                    status = DONE,
+                    tasks = listOf(completedTask, uncompletedTask.copy(status = DONE)),
+                    uncommittedChanges = todoList.uncommittedChanges + listOf(taskCompleted, todoListCompleted)
+                )
+            )
         }
     }
 

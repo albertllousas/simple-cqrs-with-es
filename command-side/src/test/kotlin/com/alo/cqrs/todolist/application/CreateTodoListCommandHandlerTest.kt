@@ -1,6 +1,7 @@
 package com.alo.cqrs.todolist.application
 
 import com.alo.cqrs.todolist.domain.model.Command
+import com.alo.cqrs.todolist.domain.model.todolist.Status
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
@@ -26,6 +27,7 @@ class CreateTodoListCommandHandlerTest {
         val expected = buildTodoList(
             TodoListId(command.aggregateId),
             command.name,
+            Status.TODO,
             emptyList(),
             listOf(TodoListCreated(command.aggregateId, command.name)
             )

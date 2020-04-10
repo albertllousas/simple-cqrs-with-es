@@ -31,7 +31,32 @@ import org.slf4j.event.Level.INFO
 import java.util.UUID
 
 fun Application.module() {
-    //command-side wiring
+    val (eventStore, commandBus) = wireCommandSide()
+    val queryHandlers = wireReadSide(eventStore)
+
+    install(DefaultHeaders)
+    install(CallLogging) {
+        level = INFO
+    }
+    install(ContentNegotiation) { jackson {} }
+    install(Routing) {
+        todoLists(commandBus)
+        todoListDetails(queryHandlers.getTodoListDetailsQuery)
+    }
+}
+
+private fun wireReadSide(eventStore: InMemoryEventStore) : ReadSideQueryHandlers{
+    val fakeDataStore = FakeProjectionsDataStore()
+    val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?> = GetTodoListDetailsQuery(fakeDataStore)
+    val todoListCreatedEventHandler = TodoListCreatedEventHandler(fakeDataStore)
+    val taskAddedEventHandler = TaskAddedEventHandler(fakeDataStore)
+    val taskCompletedEventHandler = TaskCompletedEventHandler(fakeDataStore)
+    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler, taskCompletedEventHandler)
+    eventStore.subscribe(Subscription(eventConsumer::receive))
+    return ReadSideQueryHandlers(getTodoListDetailsQuery)
+}
+
+private fun wireCommandSide(): Pair<InMemoryEventStore, SimpleCommandBus> {
     val eventStore = InMemoryEventStore()
     val todoListRepository: Repository<TodoList, TodoListId> = TodoListInMemoryEventSourcedRepository(eventStore)
     val createTodoListCommandHandler = CreateTodoListCommandHandler(todoListRepository)
@@ -41,24 +66,7 @@ fun Application.module() {
         .register(createTodoListCommandHandler)
         .register(addTaskCommandHandler)
         .register(completeTaskCommandHandler)
-    //read-side wiring
-    val fakeDataStore = FakeProjectionsDataStore()
-    val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?> = GetTodoListDetailsQuery(fakeDataStore)
-    val todoListCreatedEventHandler = TodoListCreatedEventHandler(fakeDataStore)
-    val taskAddedEventHandler = TaskAddedEventHandler(fakeDataStore)
-    val taskCompletedEventHandler = TaskCompletedEventHandler(fakeDataStore)
-    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler, taskCompletedEventHandler)
-    eventStore.subscribe(Subscription(eventConsumer::receive))
-
-    install(DefaultHeaders)
-    install(CallLogging) {
-        level = INFO
-    }
-    install(ContentNegotiation) { jackson {} }
-    install(Routing) {
-        // command routes
-        todoLists(commandBus)
-        // read routes
-        todoListDetails(getTodoListDetailsQuery)
-    }
+    return Pair(eventStore, commandBus)
 }
+
+data class ReadSideQueryHandlers(val getTodoListDetailsQuery: QueryHandler<UUID, TodoListDetailDto?>)

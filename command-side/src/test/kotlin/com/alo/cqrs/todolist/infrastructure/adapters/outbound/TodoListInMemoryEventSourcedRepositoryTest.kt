@@ -1,5 +1,7 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.outbound
 
+import com.alo.cqrs.todolist.domain.model.todolist.Status
+import com.alo.cqrs.todolist.domain.model.todolist.Status.*
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
@@ -36,7 +38,7 @@ class TodoListInMemoryEventSourcedRepositoryTest {
         val todoList = repository.get(TodoListId(uuid))
 
         assertThat(todoList).isEqualTo(
-            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, emptyList(), emptyList())
+            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, TODO,emptyList(), emptyList())
         )
     }
 

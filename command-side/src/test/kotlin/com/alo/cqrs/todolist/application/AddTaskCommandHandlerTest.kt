@@ -43,6 +43,7 @@ class AddTaskCommandHandlerTest {
         val expected = buildTodoList(
             todoList.id,
             todoList.name,
+            Status.TODO,
             listOf(Task(TaskId(staticTaskUuuid), command.name, Status.TODO)),
             listOf(TaskAdded(command.aggregateId, staticTaskUuuid, command.name)
             )
