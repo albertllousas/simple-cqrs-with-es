@@ -325,7 +325,15 @@ curl http://localhost:8080/todo-lists/77a9d273-441c-4ca6-a493-f617df6b5a23/detai
 
 ## Lessons learned
 
-CQRS, when you apply all the patterns, is not easy at all, it is complex and takes time to understand.
+CQRS, when you apply all the patterns, is not easy at all, it is complex and takes time to understand all the
+ patterns around.
+
+Even though in this example we have tried to use all the "cool" patterns, you don't need them, the basics of CQRS are
+ separate Commands from queries, that's all.
+ 
+In a production environments, the best way to go would be to apply the patterns that you need, for example if you
+ need to return values from commands, just do it, but first think why you are returning values, do you really need
+  them, could you tackle the problem differently?
 
 ## Related links
 
