@@ -2,6 +2,7 @@ package com.alo.cqrs.todolist.projection
 
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskCompletedEventHandler
+import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCompletedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -14,7 +15,8 @@ typealias EventPayload = String
 class EventConsumer(
     private val todoListCreatedEventHandler: TodoListCreatedEventHandler,
     private val taskAddedEventHandler: TaskAddedEventHandler,
-    private val taskCompletedEventHandler: TaskCompletedEventHandler
+    private val taskCompletedEventHandler: TaskCompletedEventHandler,
+    private val todoListCompletedEventHandler: TodoListCompletedEventHandler
 ) {
     private val objectMapper = jacksonObjectMapper()
 
@@ -26,6 +28,8 @@ class EventConsumer(
                 taskAddedEventHandler.handle(objectMapper.readValue(payload))
             TaskCompleted::class.simpleName!! ->
                 taskCompletedEventHandler.handle(objectMapper.readValue(payload))
+            TodoListCompleted::class.simpleName!! ->
+                todoListCompletedEventHandler.handle(objectMapper.readValue(payload))
             else -> throw UnparseableEventException(
                 type, listOf(TodoListCreated::class, TaskAdded::class, TaskCompleted::class)
             )

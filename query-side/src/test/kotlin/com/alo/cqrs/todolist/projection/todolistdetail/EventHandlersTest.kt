@@ -3,6 +3,7 @@ package com.alo.cqrs.todolist.projection.todolistdetail
 import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.TaskAdded
 import com.alo.cqrs.todolist.projection.TaskCompleted
+import com.alo.cqrs.todolist.projection.TodoListCompleted
 import com.alo.cqrs.todolist.projection.TodoListCreated
 import com.alo.cqrs.todolist.projection.todolistdetail.Status.*
 import io.mockk.mockk
@@ -87,6 +88,35 @@ class EventHandlersTest {
 
             assertThat(dataStore.get(event.aggregateId))
                 .isEqualTo(existentDetails.copy(tasks = listOf(TaskDto(event.id, "my task name", DONE))))
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Tests for updating todolistdetails projection when 'TodoListCompleted' comes")
+    inner class TodoListCompletedHandlerTest {
+
+        private val existentTaskId = randomUUID()
+
+        private val existentDetails = TodoListDetailDto(
+            id = randomUUID(),
+            name = "my todo list",
+            status = TODO,
+            tasks = emptyList()
+        )
+
+        private val dataStore = FakeProjectionsDataStore()
+            .also { it.save(existentDetails) }
+
+        private val eventHandler = TodoListCompletedEventHandler(dataStore)
+
+        @Test
+        fun `should update a todolist view to 'done'`() {
+            val event = TodoListCompleted(existentDetails.id)
+
+            eventHandler.handle(event)
+
+            assertThat(dataStore.get(event.id)).isEqualTo(existentDetails.copy(status = DONE))
         }
 
     }

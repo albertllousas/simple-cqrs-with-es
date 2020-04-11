@@ -17,6 +17,7 @@ import com.alo.cqrs.todolist.projection.QueryHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.GetTodoListDetailsQuery
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskAddedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TaskCompletedEventHandler
+import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCompletedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListCreatedEventHandler
 import com.alo.cqrs.todolist.projection.todolistdetail.TodoListDetailDto
 import com.alo.cqrs.todolist.projection.todolistdetail.todoListDetails
@@ -51,7 +52,10 @@ private fun wireReadSide(eventStore: InMemoryEventStore) : ReadSideQueryHandlers
     val todoListCreatedEventHandler = TodoListCreatedEventHandler(fakeDataStore)
     val taskAddedEventHandler = TaskAddedEventHandler(fakeDataStore)
     val taskCompletedEventHandler = TaskCompletedEventHandler(fakeDataStore)
-    val eventConsumer = EventConsumer(todoListCreatedEventHandler, taskAddedEventHandler, taskCompletedEventHandler)
+    val todoListCompletedEventHandler = TodoListCompletedEventHandler(fakeDataStore)
+    val eventConsumer = EventConsumer(
+        todoListCreatedEventHandler, taskAddedEventHandler, taskCompletedEventHandler, todoListCompletedEventHandler
+    )
     eventStore.subscribe(Subscription(eventConsumer::receive))
     return ReadSideQueryHandlers(getTodoListDetailsQuery)
 }

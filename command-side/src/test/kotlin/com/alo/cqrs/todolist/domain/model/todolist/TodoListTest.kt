@@ -97,7 +97,7 @@ class TodoListTest {
                     id = todoList.id,
                     name = todoList.name,
                     status = TODO,
-                    tasks = listOf(completedTask, uncompletedTask.copy(status = DONE), anotherUncompletedTask),
+                    tasks = listOf(completedTask, anotherUncompletedTask, uncompletedTask.copy(status = DONE)),
                     uncommittedChanges = todoList.uncommittedChanges + listOf(newEvent)
                 )
             )
@@ -123,8 +123,8 @@ class TodoListTest {
         }
 
         @Test
-        fun `should complete a todoList when all the tasks are alreasy completed`() {
-            val completedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
+        fun `should complete a todoList when we complete the last non complete task`() {
+            val completedTask = Task(TaskId(UUID.randomUUID()), "task name", DONE)
             val uncompletedTask = Task(TaskId(UUID.randomUUID()), "task name", TODO)
             val todoList = buildTodoList(tasks = listOf(completedTask, uncompletedTask))
 

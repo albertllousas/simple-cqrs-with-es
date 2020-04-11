@@ -4,6 +4,7 @@ import com.alo.cqrs.todolist.projection.EventHandler
 import com.alo.cqrs.todolist.projection.FakeProjectionsDataStore
 import com.alo.cqrs.todolist.projection.TaskAdded
 import com.alo.cqrs.todolist.projection.TaskCompleted
+import com.alo.cqrs.todolist.projection.TodoListCompleted
 import com.alo.cqrs.todolist.projection.TodoListCreated
 import com.alo.cqrs.todolist.projection.todolistdetail.Status.*
 import java.util.UUID
@@ -43,4 +44,14 @@ class TaskCompletedEventHandler(
             ?.let { uncompletedTask -> uncompletedTask.copy(status = DONE) }
             ?.let { completedTask -> tasks.filter { it.id != taskId } + listOf(completedTask) }
             ?: tasks
+}
+
+class TodoListCompletedEventHandler(
+    private val datastore: FakeProjectionsDataStore
+) : EventHandler<TodoListCompleted> {
+    override fun handle(event: TodoListCompleted) {
+        datastore.get(event.id)!!
+            .let { it.copy(status = DONE) }
+            .also { datastore.save(it) }
+    }
 }

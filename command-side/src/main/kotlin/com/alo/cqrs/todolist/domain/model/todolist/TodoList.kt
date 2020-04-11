@@ -29,14 +29,17 @@ data class TodoList private constructor(
     fun completeTask(taskId: TaskId): TodoList =
         TaskCompleted(this.id.value, taskId.value)
             .let { apply(it) }
-            .let { it.complete() }
+            .let { newTodoList ->
+                if(myself.allTasksAreCompleted()) newTodoList
+                else newTodoList.tryToComplete()
+            }
 
-    fun complete() =
-        if (this.isCompleted()) myself
-        else apply(TodoListCompleted(id.value))
+    private fun tryToComplete() =
+        if (this.allTasksAreCompleted()) apply(TodoListCompleted(id.value))
+        else myself
 
 
-    fun isCompleted(): Boolean = !this.tasks.exists { task -> !task.isCompleted() }
+    private fun allTasksAreCompleted(): Boolean = !this.tasks.exists { task -> !task.isCompleted() }
 
     private fun apply(event: TodoListCompleted): TodoList =
         this.copy(

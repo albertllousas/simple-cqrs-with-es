@@ -7,6 +7,7 @@ import com.alo.cqrs.todolist.domain.model.todolist.TaskAdded
 import com.alo.cqrs.todolist.domain.model.todolist.TaskCompleted
 import com.alo.cqrs.todolist.domain.model.todolist.TaskId
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
+import com.alo.cqrs.todolist.domain.model.todolist.TodoListCompleted
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
 import com.alo.cqrs.todolist.domain.ports.outbound.Repository
@@ -24,7 +25,7 @@ class CompleteTaskCommandHandlerTest {
     private val commandHandler = CompleteTaskCommandHandler(repository)
 
     @Test
-    fun `should handle the creation of a new todo-list`() {
+    fun `should handle the completion of a task`() {
         val command = Command.CompleteTask(aggregateId = UUID.randomUUID(), taskId = UUID.randomUUID())
         val todoList = buildTodoList(
             id = TodoListId(command.aggregateId),
@@ -37,8 +38,11 @@ class CompleteTaskCommandHandlerTest {
         val expected = buildTodoList(
             id = todoList.id,
             name = todoList.name,
+            status = Status.DONE,
             tasks = listOf(Task(TaskId(command.taskId), "my task", Status.DONE)),
-            uncommittedChanges = listOf(TaskCompleted(command.aggregateId, command.taskId)
+            uncommittedChanges = listOf(
+                TaskCompleted(command.aggregateId, command.taskId),
+                TodoListCompleted(command.aggregateId)
             )
         )
         verify { repository.save(expected) }

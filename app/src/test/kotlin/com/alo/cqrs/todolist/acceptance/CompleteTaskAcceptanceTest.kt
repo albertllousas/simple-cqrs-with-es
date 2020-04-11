@@ -104,7 +104,7 @@ class CompleteTaskAcceptanceTest {
 					{
                         "id":"$id",
                         "name":"my todo list",
-                        "status":"TODO",
+                        "status":"DONE",
                         "tasks":[
                             {
                                 "id": "$taskId",
