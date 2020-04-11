@@ -32,7 +32,7 @@ CQRS stands for Command Query Responsibility Segregation, and it is a pattern in
  it is also an extension from an older concept, [CQS](https://en.wikipedia.org/wiki/Command%E2%80%93query_separation) introduce by by Bertrand Meyer.
  
 Conceptually, CQRS is very simple, the basic idea is to separate the querying of data (read-side/query) from the
- updating of data (write-side/commands) models.
+ updating of data models (write-side/commands).
  
 But, let's see a more elaborate but brief explanation in the next sections ...
  
@@ -61,8 +61,12 @@ queries (read requests). The write requests and the read requests are handled by
 One write model, which you can use to change the state of your domain objects. Then multiple read models, one for
  each client. 
  
-That way, there will be less coupling, so better Separation of Concerns and it will be easy to evolve the model in any direction. Almost
- any complex business could belong the write model and the read model can be more simple.
+That way, there will be less coupling, so better Separation of Concerns and it will be easy to evolve the model in
+ any direction. Business logic would belong to the write model and the read model would be more simple.
+ 
+The problem here is that we are still sharing the database with both sides, so we could have scalability and
+ performance, also patterns like micro-services are not fitting if we want to separate the projects in different
+  services.
 
 But let's evolve this to next step ...
 
@@ -112,10 +116,12 @@ Now, let's say that this codes is executed, but transaction commit fails, withou
 The way to solve/avoid dual writes is to split the communication into multiple steps and only write to one
  external system during each step, here some solutions:
 
-- [Transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html):If you use a RDBMS
- you can create an event-log table, then you can wrap the updates in your domain and the event-log in the same
-  transaction. After that you can fetch the events with simple schedulers or complex (Schedlock) and send a message to the projection mechanism. 
- Note: Your projection mechanism will have to handle with idempotency because the fetch can also fail.
+- [Transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html): If you use a RDBMS
+ you can create a separate table (event-log), where you would store changes to be propagated to other systems. Then, 
+  when you have to do a dual write, you create a local transaction where you commit together the changes in
+   your domain and the changes to be propagated in the event-log table. After that you just need to fetch the events
+    with and propagate the changes. 
+ *Note*: Your projection mechanism will have to handle idempotency and retry mechanisms because the fetch can also fail.
 - Use [CDC](https://en.wikipedia.org/wiki/Change_data_capture) tools (change data capture), like Debezium, they will
  capture and propagate the changes ensuring consistency.
 - Use an event-store in the write side, this will be explained in the following section.  
@@ -123,7 +129,7 @@ The way to solve/avoid dual writes is to split the communication into multiple s
 ### CQRs with event sourcing
 
 Last step is to introduce [event sourcing](https://microservices.io/patterns/data/event-sourcing.html), with this
- approach we would remove the dual write problem but also we will introduce new advantages and new drawbacks. The
+ approach we would remove the dual write problem but also we will introduce new advantages and drawbacks. The
   idea is the same as the previous approach but using an event store.
 
 <p align="center">
@@ -141,16 +147,13 @@ Till now, we have implemented CQRS, but usually CQRS doesn't come alone in term 
 </p>
 
 Patterns that come with CQRS:
-- DDD Aggregates
+- DDD
 - Command-bus
-- Events 
+- Event-sourcing
 - Optimistic locking
 
 Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit them if
  they are over-complicating your system.
- 
-It is important to mention, that as Martin fowler explains in this talk, you don't need even to make commands async
-, they can return values if your app needs it.
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 
@@ -200,9 +203,10 @@ This restriction has some implications in the design:
 
 - Domain objects should generate events when it's state changes.
 - Domain objects should be able to be reconstructed from an event stream.
-- We will need an event-store.
+- We will need a mechanism to store events, an event-store.
 - Our repositories will just `get` and `save` aggregates, but under the hood it will be streams of events.
-- And more implications and complexities ... check the links at the end for more information about event sourcing.
+- And more implications and complexities ... check [links section](#related-links) at the end for more information about event
+ sourcing.
 
 These are the events that we will handle: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
 
@@ -214,24 +218,39 @@ Till now we have CQRS, DDD and event-sourcing, but now we have to fit everything
   pattern.
 
 Trying to fit all the components in an hexagonal architecture is not easy at all, but let's see how a general diagram
- of cqrs over hexagonal would look like (since query-side is easier, just pay attention in the command side):
+ of cqrs with hexagonal would look like:
  
 <p align="center">
   <img src="misc/cqrs-hexa-1.png"  width="85%"/>
 </p> 
 
-And now let's focus in our problem (only command-side):
+And now let's focus in our problem:
 
 <p align="center">
   <img src="misc/cqrs-hexa-2.png"  width="95%"/>
 </p> 
+
+Hexagonal architecture is all about ports and adapters, so one way to fit CQRS would be:
+
+- Application services: Use cases of the app, in our case the **command handlers**, they would implement the inbound
+ ports to the hexagon. 
+- Domain: The hexagon itself, the business logic composed by the domain model and the ports interfaces.
+- Infrastructure: The out-side world  
+    - Adapters:
+        - Inbound adapters: They call the entrypoints (inbound/driver ports) to the hexagon, in our case **HttpRoutes**  and  
+        **EventHandlers**, they do it through the command bus.
+        - Outbound adapters: They implement the outbound/driven ports and adapt/translate the outside world to our
+         domain, mainly **repositories**.
+    - Non-hexagonal components: All the other components, **command-bus**, the **event-store** and any third party
+     integration that the app would need. 
 
 ### Simple Query-side
 
 Hexagonal architecture is a domain-centric architectural pattern, but since query side does not have
  domain or any business logic, do we need an hexagonal approach? 
 
-Query side, as CQRS trend advocates to, should be as thin as possible, getting as close to the data store as possible.
+Query side, as CQRS trend advocates to, should be as thin as possible, getting as close to the data store, skipping
+ any not necessary layer.
 
 So, what are the responsibilities of the query side? 
 
@@ -328,7 +347,7 @@ curl http://localhost:8080/todo-lists/77a9d273-441c-4ca6-a493-f617df6b5a23/detai
 CQRS, when you apply all the patterns, is not easy at all, it is complex and takes time to understand all the
  patterns around.
 
-Even though in this example we have tried to use all the "cool" patterns, you don't need them, the basics of CQRS are
+Even though in this example I have tried to use all the "cool" patterns, you don't need them, the basics of CQRS are
  separate Commands from queries, that's all.
  
 In a production environments, the best way to go would be to apply the patterns that you need, for example if you

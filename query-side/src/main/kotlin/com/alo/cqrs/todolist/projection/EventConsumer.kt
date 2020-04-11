@@ -37,8 +37,7 @@ class UnparseableEventException(
     type: EventType,
     allowedTypes: List<KClass<out Event>>
 ) : Exception(
-    "Impossible to parse event type '$type', only types '${allowedTypes.map { it.simpleName }}' are " +
-    "allowed."
+    "Impossible to parse event type '$type', only types '${allowedTypes.map { it.simpleName }}' are allowed."
 )
 
 
