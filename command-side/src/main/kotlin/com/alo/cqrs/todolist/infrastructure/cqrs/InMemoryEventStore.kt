@@ -36,15 +36,10 @@ class InMemoryEventStore : EventStore {
         subscribers.forEach { it.trigger(event.type, event.payload) }
     }
 
-    fun subscribe(subscription: Subscription) = subscribers.add(subscription)
+    override fun subscribe(subscription: Subscription) {
+        subscribers.add(subscription)
+    }
 
 }
 
 private data class StreamEntry(val event: Event, val version: Long)
-
-data class Subscription(val trigger: (String, String) -> Unit)
-
-class OptimisticLockingException(streamId: String, currentVersion: Long, expectedVersion: Long) : Exception(
-    "Current version '$expectedVersion' does not match stored version '$currentVersion' for stream '$streamId'"
-)
-

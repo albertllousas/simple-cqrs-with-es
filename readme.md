@@ -17,6 +17,7 @@ Also, I am not an expert on the topic, not even a beginner, so this is a way to 
    * [Simple todo-list Service](#simple-todo-list-service)
      + [Domain model with DDD](#domain-model-with-ddd)
      + [Event sourcing](#event-sourcing)
+       - [Designing a simple event store](#designing-a-simple-event-store)
      + [Fitting command-side in hexagonal architecture](#fitting-command-side-in-hexagonal-architecture)
      + [Simple Query-side](#simple-query-side)
      + [Project structure](#project-structure)
@@ -182,7 +183,12 @@ Second iteration:
 
 ### Domain model with DDD
 
-I will try to apply DDD concepts, sorry if I make mistakes but I am not an expert.
+There is a perfect exercise that would fit for our goal, designing and modeling DDD and CQRS as a context, and it is
+ called [event-storming](https://en.wikipedia.org/wiki/Event_storming), it is workshop that help us to identify our
+  DDD components and dependencies. But our problem is simple we are not going to explain it or even try to apply it
+  , it would deserve a whole blog for that.
+
+So, I will try to apply DDD concepts right away, sorry if I make mistakes but I am not a expert.
 
 Let's map out our business domain for the MVP:
 
@@ -199,17 +205,74 @@ DDD [definitions](https://dddcommunity.org/resources/ddd_terms/)
 In a nutshell, event sourcing differs from a typical approach on how a business object is persisted, instead of
  storing the current state, it stores a sequence of state changing events.
 
-This restriction has some implications in the design:
+This restriction has some implications in our design:
 
-- Domain objects should generate events when it's state changes.
-- Domain objects should be able to be reconstructed from an event stream.
+- Aggregates should generate events when it's state changes.
+- Aggregates should be able to be reconstructed from an event stream.
 - We will need a mechanism to store events, an event-store.
-- Our repositories will just `get` and `save` aggregates, but under the hood it will be streams of events.
-- And more implications and complexities ... check [links section](#related-links) at the end for more information about event
- sourcing.
+- Our repositories will just `get` and `save` aggregates, but under the hood they will handle streams of events.
+- And more implications and complexities ... check [links section](#related-links) at the end, for more information
+ about event sourcing.
 
-These are the events that we will handle: `TodoListCreated`, `TaskAdded`, `TaskFinished`, `TodoListFinished`
+Coming back to our new domain, these are the events that we will handle: 
 
+- `TodoListCreated` 
+- `TaskAdded`
+- `TaskFinished`
+- `TodoListFinished`
+
+#### Designing a simple event store 
+
+There are already event-store production ready implementations that would fit for our purpose, but we will try to
+ design a simple event-store in order to understand event sourcing from the implementation side.
+ 
+As we said, event-sourcing as an idea, is pretty simple:
+
+> The core idea of event sourcing is that whenever we make a change to the state of a system, we record that state
+> change as an event, and we can confidently rebuild the system state by reprocessing the events at any time in the future.
+> Martin fowler
+
+If we think out of the box and trying to DDD agnostic, we could think that an event store just as a database that
+ allow us to:
+
+- **Append events to a specific stream of events**
+- **Retrieve all events from an specific stream**
+- **Publish events that happened in the system**
+
+We already know that event sourcing is more complex than that, a production ready event store will provide features
+ like:
+- [Optimistic locking](https://enterprisecraftsmanship.com/posts/optimistic-locking-automatic-retry/) 
+- [Rolling snapshots](https://eventstore.com/docs/event-sourcing-basics/rolling-snapshots/index.html)
+- Reliable pub/sub 
+- Distributed storage
+- Event replaying
+- Scalability
+- Many others
+
+But let's think in a minimal implementation, what we already need to work with our aggregates? One possible approach
+ that could work could be:
+
+```
+ +----------+----------------+--------+--------+
+ |stream_id |type            |payload |version |
+ +----------+----------------+--------+--------+
+ |4db3b6ae  |TodoListCreated |{json}  | 1      | 
+ |202dba03  |TodoListCreated |{json}  | 1      |
+ |202dba03  |TaskAdded       |{json}  | 2      |
+ |202dba03  |TaskAdded       |{json}  | 3      |
+ +--------+------------------+--------+--------+ 
+```
+With this simple storage in mind, we would be able to enable a simple database for a CQRS environment, allowing to read
+ and write sequences of immutable events for a particular aggregate, in our case instances of todo-lists.
+
+We could think in many more fields, like timestamp (of the event), eventId (to handle idempotency), transactionId (to
+ group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), but
+  for a simple implementation we wouldn't need them.
+ 
+With the previous definition we are ready to implement an event store in almost any way, in memory, RDBMS, nosql
+ database or just a file ... in this project, for the sake of simplicity, a simple in memory solution :
+ - [Event store definition](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/EventStore.kt)
+ - [In memory implementation](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/InMemoryEventStore.kt)
 
 ### Fitting command-side in hexagonal architecture
 
@@ -363,5 +426,6 @@ In a production environments, the best way to go would be to apply the patterns 
 - [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html)
 - [Event Sourcing by Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html)
-- [Things to consider](https://www.sderosiaux.com/articles/2019/08/29/cqrs-why-and-all-the-things-to-consider/)
+- [Designing an event-store](https://itnext.io/implementing-event-store-in-c-8a27138cc90)
+- [CQRS, things to consider](https://www.sderosiaux.com/articles/2019/08/29/cqrs-why-and-all-the-things-to-consider/)
 - [DZone CQRS intro](https://dzone.com/articles/cqrs-and-event-sourcing-intro-for-developers)
