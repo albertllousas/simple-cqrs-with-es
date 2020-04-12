@@ -71,7 +71,5 @@ class InMemoryEventStoreIntegrationTest {
             .hasMessageContaining(
                 "Current version '0' does not match stored version '1' for stream '$aggregateId'"
             )
-
-
     }
 }
