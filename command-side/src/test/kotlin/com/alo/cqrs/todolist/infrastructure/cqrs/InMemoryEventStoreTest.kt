@@ -1,6 +1,5 @@
 package com.alo.cqrs.todolist.infrastructure.cqrs
 
-import com.alo.cqrs.todolist.domain.model.AggregateNotFoundException
 import com.alo.cqrs.todolist.domain.model.todolist.TaskAdded
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -31,10 +30,10 @@ class InMemoryEventStoreIntegrationTest {
             type = taskAdded::class.simpleName!!
         )
 
-        eventStore.write(aggregateId, listOf(first, second), 0)
-        val readResponse = eventStore.read(aggregateId)
+        eventStore.write(aggregateId.toString(), listOf(first, second), 0)
+        val readResponse = eventStore.read(aggregateId.toString())
 
-        assertThat(readResponse).isEqualTo(ReadResponse(events = listOf(first, second), currentVersion = 2))
+        assertThat(readResponse).isEqualTo(EventStream(events = listOf(first, second), currentVersion = 2))
     }
 
     @Test
@@ -47,7 +46,7 @@ class InMemoryEventStoreIntegrationTest {
         )
         val callback = mockk<(String, String) -> Unit>(relaxed = true)
 
-        eventStore.subscribe(Subscription(callback)).also { eventStore.write(aggregateId, listOf(event), 1) }
+        eventStore.subscribe(Subscription(callback)).also { eventStore.write(aggregateId.toString(), listOf(event), 1) }
 
         verify { callback.invoke(event.type, event.payload) }
     }
@@ -65,12 +64,12 @@ class InMemoryEventStoreIntegrationTest {
             payload = objectMapper.writeValueAsString(taskAdded),
             type = taskAdded::class.simpleName!!
         )
-        eventStore.write(aggregateId, listOf(first), 0)
+        eventStore.write(aggregateId.toString(), listOf(first), 0)
 
-        Assertions.assertThatThrownBy { eventStore.write(aggregateId, listOf(second), 0) }
+        Assertions.assertThatThrownBy { eventStore.write(aggregateId.toString(), listOf(second), 0) }
             .isInstanceOf(OptimisticLockingException::class.java)
             .hasMessageContaining(
-                "Current version '0' does not match stored version '1' for aggregateId '$aggregateId'"
+                "Current version '0' does not match stored version '1' for stream '$aggregateId'"
             )
 
 

@@ -1,13 +1,12 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.outbound
 
 import com.alo.cqrs.todolist.domain.model.todolist.Status.*
-import com.alo.cqrs.todolist.domain.model.todolist.TaskAdded
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
 import com.alo.cqrs.todolist.fixtures.buildTodoList
 import com.alo.cqrs.todolist.infrastructure.cqrs.InMemoryEventStore
 import com.alo.cqrs.todolist.infrastructure.cqrs.Event
-import com.alo.cqrs.todolist.infrastructure.cqrs.ReadResponse
+import com.alo.cqrs.todolist.infrastructure.cqrs.EventStream
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
@@ -33,7 +32,7 @@ class TodoListInMemoryEventSourcedRepositoryTest {
             payload = mapper.writeValueAsString(domainEvent),
             type = domainEvent::class.simpleName!!
         )
-        every { eventStore.read(uuid) } returns ReadResponse(listOf(event), 1)
+        every { eventStore.read(uuid.toString()) } returns EventStream(listOf(event), 1)
 
         val todoList = repository.get(TodoListId(uuid))
 
@@ -45,7 +44,7 @@ class TodoListInMemoryEventSourcedRepositoryTest {
     @Test
     fun `should not get a todo list when there are no previous events`() {
         val aggregateId = UUID.randomUUID()
-        every { eventStore.read(aggregateId) } returns ReadResponse(emptyList(), 0)
+        every { eventStore.read(aggregateId.toString()) } returns EventStream(emptyList(), 0)
 
         assertThat(repository.get(TodoListId(aggregateId))).isNull()
     }
@@ -63,6 +62,6 @@ class TodoListInMemoryEventSourcedRepositoryTest {
             mapper.writeValueAsString(todoListCreated),
             "TodoListCreated"
         )
-        verify { eventStore.write(todoList.id.value, listOf(event), todoList.version) }
+        verify { eventStore.write(todoList.id.value.toString(), listOf(event), todoList.version) }
     }
 }

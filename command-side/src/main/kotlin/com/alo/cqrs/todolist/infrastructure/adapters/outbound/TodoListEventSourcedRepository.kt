@@ -18,7 +18,7 @@ class TodoListInMemoryEventSourcedRepository(
 
     override fun save(aggregate: TodoList) {
         eventStore.write(
-            aggregateId = aggregate.id.value,
+            streamId = aggregate.id.value.toString(),
             events = aggregate.uncommittedChanges.mapIndexed { index, domainEvent ->
                 Event(
                     payload = objectMapper.writeValueAsString(domainEvent),
@@ -30,7 +30,7 @@ class TodoListInMemoryEventSourcedRepository(
     }
 
     override fun get(id: TodoListId): TodoList? {
-        val response = eventStore.read(id.value)
+        val response = eventStore.read(id.value.toString())
         if (response.events.isEmpty()) return null
         return response.events
             .let { it.map { event -> objectMapper.readValue(event.payload, resolveClass(event.type)) as TodoListEvent } }
