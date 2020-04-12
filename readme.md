@@ -150,11 +150,13 @@ Till now, we have implemented CQRS, but usually CQRS doesn't come alone in term 
 Patterns that come with CQRS:
 - DDD
 - Command-bus
+- Command-handlers
+- Event-handlers
 - Event-sourcing
 - Optimistic locking
 
-Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit them if
- they are over-complicating your system.
+Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit/change
+ them if they are over-complicating your system.
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 
@@ -275,8 +277,9 @@ With this simple definition in mind, we would be able to provide a simple databa
  - [In memory implementation](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/InMemoryEventStore.kt)
  
 We could think in many more fields, like timestamp (when the event happened), eventId (to handle idempotency), 
-transactionId (to group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), 
-but for our simple implementation we don't need them.
+transactionId (to group events), sequence number (all events), clusterId (to group or subscribe streams in a more
+ granular way) or a correlationId (allow reference to a particular transaction) but for our simple implementation we
+  don't need them.
 
 ### Fitting command-side in hexagonal architecture
 
@@ -310,6 +313,9 @@ Hexagonal architecture is all about ports and adapters, so one way to fit CQRS w
          domain, mainly **repositories**.
     - Non-hexagonal components: All the other components, **command-bus**, the **event-store** and any third party
      integration that the app would need. 
+     
+As we already said before, this is just an example on how to do it, use this patterns depending on your app
+ requirements, for example command-handlers can be totally async or return values, or you can not use them at all.
 
 ### Simple Query-side
 
@@ -355,7 +361,7 @@ com.alo.cqrs.todolist
                      |   |-- inbound // they call the inbound ports, also call primary actors
                      |   |   |-- rest  // rest entry-points 
                      |   |   `-- eventhandlers // listeners of app events
-                     |   `-- outbound // implementations of the outbound ports
+                     |   `-- outbound // implementations of the outbound ports, repositories
                      `-- cqrs // non-hexagonal components
 
 ```
@@ -411,11 +417,10 @@ curl http://localhost:8080/todo-lists/77a9d273-441c-4ca6-a493-f617df6b5a23/detai
 
 ## Lessons learned
 
-CQRS, when you apply all the patterns, is not easy at all, it is complex and takes time to understand all the
- patterns around.
+CQRS is not easy at all, it is complex and takes time to understand all the patterns around.
 
 Even though in this example I have tried to use all the "cool" patterns, you don't need them, the basics of CQRS are
- separate Commands from queries, that's all.
+ separate Commands from Queries, that's all.
  
 In a production environments, the best way to go would be to apply the patterns that you need, for example if you
  need to return values from commands, just do it, but first think why you are returning values, do you really need
