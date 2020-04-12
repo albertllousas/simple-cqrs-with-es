@@ -1,7 +1,7 @@
 # CQRS, event-sourcing, DDD and hexagonal architecture: Tracking order service
 
-The following repository tries to describe a basic CQRS with Kotlin and Ktor as a base framework, our main goal is
- understand through a simple implementation this pattern.
+The following repository tries to describe CQRS pattern by implementing it with Kotlin as a language and Ktor as a base
+ framework.
  
 **This is not production code, this is a CQRS implementation in order to understand the pattern.**
 
@@ -14,7 +14,7 @@ Also, I am not an expert on the topic, not even a beginner, so this is a way to 
      + [CQRS with separate storage engines](#cqrs-with-separate-storage-engines)
        - [Dual writes](#dual-writes)
      + [CQRs with event sourcing](#cqrs-with-event-sourcing)
-   * [Simple todo-list Service](#simple-todo-list-service)
+   * [Simple todo-list micro-service](#simple-todo-list-micro-service)
      + [Domain model with DDD](#domain-model-with-ddd)
      + [Event sourcing](#event-sourcing)
        - [Designing a simple event store](#designing-a-simple-event-store)
@@ -129,7 +129,7 @@ The way to solve/avoid dual writes is to split the communication into multiple s
 
 ### CQRs with event sourcing
 
-Last step is to introduce [event sourcing](https://microservices.io/patterns/data/event-sourcing.html), with this
+The last step is to introduce [event sourcing](https://microservices.io/patterns/data/event-sourcing.html), with this
  approach we would remove the dual write problem but also we will introduce new advantages and drawbacks. The
   idea is the same as the previous approach but using an event store.
 
@@ -158,10 +158,12 @@ Any of these patterns are mandatory to do CQRS, you don't have to use them, in p
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 
-## Simple todo-list Service
+## Simple todo-list micro-service
 
-Let's think about a fake company, they have an internal micro-services ecosystem and they need to build a new
- feature for all the frontends ... Boom! a TODO-LIST to help the customers to keep track of daily obligations.
+Having explained CQRS key concepts, let's think a problem to solve, where we can apply all it. 
+
+Imagine that we are in a fake company,they have an internal micro-services ecosystem and they need to build a new
+ feature for all the frontends ... Boom! a TODO-LIST to help the customers to keep track of their daily obligations.
 
 So, our sample application is a super simple TODO-LIST micro-service, where:
 
@@ -185,8 +187,8 @@ Second iteration:
 
 There is a perfect exercise that would fit for our goal, designing and modeling DDD and CQRS as a context, and it is
  called [event-storming](https://en.wikipedia.org/wiki/Event_storming), it is workshop that help us to identify our
-  DDD components and dependencies. But our problem is simple we are not going to explain it or even try to apply it
-  , it would deserve a whole blog for that.
+  DDD components and dependencies. But our problem is simple, we are not going to explain it or even try to apply it
+  , event-storming would deserve a whole blog.
 
 So, I will try to apply DDD concepts right away, sorry if I make mistakes but I am not a expert.
 
@@ -239,7 +241,7 @@ If we think out of the box and trying to DDD agnostic, we could think that an ev
 - **Retrieve all events from an specific stream**
 - **Publish events that happened in the system**
 
-We already know that event sourcing is more complex than that, a production ready event store will provide features
+We already know that event sourcing is more complex than that, a production-ready event store will provide features
  like:
 - [Optimistic locking](https://enterprisecraftsmanship.com/posts/optimistic-locking-automatic-retry/) 
 - [Rolling snapshots](https://eventstore.com/docs/event-sourcing-basics/rolling-snapshots/index.html)
@@ -249,8 +251,9 @@ We already know that event sourcing is more complex than that, a production read
 - Scalability
 - Many others
 
-But let's think in a minimal implementation, what we already need to work with our aggregates? One possible approach
- that could work could be:
+But let's think in a minimal implementation that allow us to write and read per aggregate.
+ 
+Event Store could be an *append-only storage mechanism*, where each entry could be as simple as:
 
 ```
  +----------+----------------+--------+--------+
@@ -262,16 +265,18 @@ But let's think in a minimal implementation, what we already need to work with o
  |202dba03  |TaskAdded       |{json}  | 3      |
  +--------+------------------+--------+--------+ 
 ```
-With this simple definition in mind, we are able to provide a design a simple database for a CQRS environment
+With this simple definition in mind, we would be able to provide a simple database design for a CQRS environment
 , allowing to read and write sequences of immutable events for a particular aggregate, in our case instances of todo-lists.
- We are also ready to implement an event store in almost any way, in memory, RDBMS, nosql database or just a
- file ... but in this project, for the sake of simplicity, a simple in-memory solution is enough:
+
+ We would be also ready to implement an event store in almost any way, in memory, using a RDBMS, with a nosql
+  database or just a file ... but in this project, for the sake of simplicity, a simple in-memory solution is the
+   choice:
  - [Event store definition](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/EventStore.kt)
  - [In memory implementation](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/InMemoryEventStore.kt)
  
-We could think in many more fields, like timestamp (of the event), eventId (to handle idempotency), transactionId (to
- group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), but
- for a simple implementation we wouldn't need them.
+We could think in many more fields, like timestamp (when the event happened), eventId (to handle idempotency), 
+transactionId (to group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), 
+but for our simple implementation we don't need them.
 
 ### Fitting command-side in hexagonal architecture
 
