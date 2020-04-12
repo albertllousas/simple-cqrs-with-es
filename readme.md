@@ -262,17 +262,16 @@ But let's think in a minimal implementation, what we already need to work with o
  |202dba03  |TaskAdded       |{json}  | 3      |
  +--------+------------------+--------+--------+ 
 ```
-With this simple storage in mind, we would be able to enable a simple database for a CQRS environment, allowing to read
- and write sequences of immutable events for a particular aggregate, in our case instances of todo-lists.
-
-We could think in many more fields, like timestamp (of the event), eventId (to handle idempotency), transactionId (to
- group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), but
-  for a simple implementation we wouldn't need them.
- 
-With the previous definition we are ready to implement an event store in almost any way, in memory, RDBMS, nosql
- database or just a file ... in this project, for the sake of simplicity, a simple in memory solution :
+With this simple definition in mind, we are able to provide a design a simple database for a CQRS environment
+, allowing to read and write sequences of immutable events for a particular aggregate, in our case instances of todo-lists.
+ We are also ready to implement an event store in almost any way, in memory, RDBMS, nosql database or just a
+ file ... but in this project, for the sake of simplicity, a simple in-memory solution is enough:
  - [Event store definition](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/EventStore.kt)
  - [In memory implementation](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/InMemoryEventStore.kt)
+ 
+We could think in many more fields, like timestamp (of the event), eventId (to handle idempotency), transactionId (to
+ group events), sequence number (all events) or clusterId (to group or subscribe streams in a more granular way), but
+ for a simple implementation we wouldn't need them.
 
 ### Fitting command-side in hexagonal architecture
 
