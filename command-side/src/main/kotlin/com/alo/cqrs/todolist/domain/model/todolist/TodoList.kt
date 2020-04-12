@@ -14,6 +14,7 @@ data class TodoListId(override val value: UUID) : AggregateId()
 
 data class TodoList private constructor(
     override val id: TodoListId,
+    override val version: Long,
     val name: String,
     val status: Status,
     val tasks: List<Task>,
@@ -70,18 +71,27 @@ data class TodoList private constructor(
                 name = name,
                 tasks = emptyList(),
                 status = TODO,
+                version = 1,
                 uncommittedChanges = listOf(TodoListCreated(id.value, name))
             )
 
         fun restoreState(
-            id: TodoListId, name: String, status: Status, tasks: List<Task>, uncommittedChanges: List<DomainEvent>
+            id: TodoListId,
+            name: String,
+            version: Long,
+            status: Status,
+            tasks: List<Task>,
+            uncommittedChanges: List<DomainEvent>
         ): TodoList =
-            TodoList(id, name, status, tasks, uncommittedChanges)
+            TodoList(id, version, name, status, tasks, uncommittedChanges)
 
-        fun recreate(history: List<DomainEvent>): TodoList {
+        fun recreate(history: List<DomainEvent>, version: Long): TodoList {
             val creationEvent = history.first() as TodoListCreated
             val initial = create(TodoListId(creationEvent.id), creationEvent.name)
-            return history.foldLeft(initial, this::apply).copy(uncommittedChanges = emptyList())
+
+            return history.foldLeft(initial, this::apply)
+                .copy(uncommittedChanges = emptyList())
+                .copy(version = version)
         }
 
         private fun apply(currentState: TodoList, event: DomainEvent): TodoList =
@@ -93,6 +103,5 @@ data class TodoList private constructor(
                     is TodoListCompleted -> currentState.apply(event)
                 }
             else throw UnsupportedEventException(aggregateClass = TodoList::class, eventClass = event::class)
-
     }
 }

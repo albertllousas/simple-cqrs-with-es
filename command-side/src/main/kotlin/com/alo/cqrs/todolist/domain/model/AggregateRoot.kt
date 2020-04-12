@@ -8,5 +8,6 @@ abstract class AggregateId {
 
 abstract class AggregateRoot() {
     abstract val id: AggregateId
+    abstract val version: Long
     abstract val uncommittedChanges: List<DomainEvent>
 }

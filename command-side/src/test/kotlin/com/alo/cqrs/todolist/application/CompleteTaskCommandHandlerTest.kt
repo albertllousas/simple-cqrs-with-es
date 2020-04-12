@@ -38,6 +38,7 @@ class CompleteTaskCommandHandlerTest {
         val expected = buildTodoList(
             id = todoList.id,
             name = todoList.name,
+            version = todoList.version,
             status = Status.DONE,
             tasks = listOf(Task(TaskId(command.taskId), "my task", Status.DONE)),
             uncommittedChanges = listOf(

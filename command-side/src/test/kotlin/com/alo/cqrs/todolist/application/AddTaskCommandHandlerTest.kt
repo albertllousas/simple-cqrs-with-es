@@ -41,11 +41,12 @@ class AddTaskCommandHandlerTest {
         commandHandler.handle(command)
 
         val expected = buildTodoList(
-            todoList.id,
-            todoList.name,
-            Status.TODO,
-            listOf(Task(TaskId(staticTaskUuuid), command.name, Status.TODO)),
-            listOf(TaskAdded(command.aggregateId, staticTaskUuuid, command.name)
+            id= todoList.id,
+            name= todoList.name,
+            version = todoList.version,
+            status = Status.TODO,
+            tasks = listOf(Task(TaskId(staticTaskUuuid), command.name, Status.TODO)),
+            uncommittedChanges = listOf(TaskAdded(command.aggregateId, staticTaskUuuid, command.name)
             )
         )
         verify { repository.save(expected) }

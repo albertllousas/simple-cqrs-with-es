@@ -1,13 +1,13 @@
 package com.alo.cqrs.todolist.infrastructure.adapters.outbound
 
-import com.alo.cqrs.todolist.domain.model.todolist.Status
 import com.alo.cqrs.todolist.domain.model.todolist.Status.*
-import com.alo.cqrs.todolist.domain.model.todolist.TodoList
+import com.alo.cqrs.todolist.domain.model.todolist.TaskAdded
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
 import com.alo.cqrs.todolist.fixtures.buildTodoList
 import com.alo.cqrs.todolist.infrastructure.cqrs.InMemoryEventStore
-import com.alo.cqrs.todolist.infrastructure.cqrs.SerializedEvent
+import com.alo.cqrs.todolist.infrastructure.cqrs.Event
+import com.alo.cqrs.todolist.infrastructure.cqrs.ReadResponse
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
@@ -19,38 +19,50 @@ import java.util.UUID
 
 class TodoListInMemoryEventSourcedRepositoryTest {
 
-    private val objectMapper = jacksonObjectMapper()
+    private val mapper = jacksonObjectMapper()
 
     private val eventStore = mockk<InMemoryEventStore>(relaxed = true)
 
     private val repository = TodoListInMemoryEventSourcedRepository(eventStore)
 
     @Test
-    fun `should get all events of a todo list`() {
+    fun `should get a todo list`() {
         val uuid = UUID.randomUUID()
         val domainEvent = TodoListCreated(uuid, "My todo list")
-        val event = SerializedEvent(
-            payload = objectMapper.writeValueAsString(domainEvent),
+        val event = Event(
+            payload = mapper.writeValueAsString(domainEvent),
             type = domainEvent::class.simpleName!!
         )
-        every { eventStore.read(uuid) } returns listOf(event)
+        every { eventStore.read(uuid) } returns ReadResponse(listOf(event), 1)
 
         val todoList = repository.get(TodoListId(uuid))
 
         assertThat(todoList).isEqualTo(
-            TodoList.Factory.restoreState(TodoListId(uuid), domainEvent.name, TODO,emptyList(), emptyList())
+            buildTodoList(TodoListId(uuid), domainEvent.name, 1, TODO, emptyList(), emptyList())
         )
     }
 
     @Test
+    fun `should not get a todo list when there are no previous events`() {
+        val aggregateId = UUID.randomUUID()
+        every { eventStore.read(aggregateId) } returns ReadResponse(emptyList(), 0)
+
+        assertThat(repository.get(TodoListId(aggregateId))).isNull()
+    }
+
+    @Test
     fun `should save a todo list`() {
-        val uuid = UUID.randomUUID()
-        val domainEvent = TodoListCreated(uuid, "My todo list")
-        val todoList = buildTodoList(id = TodoListId(uuid), uncommittedChanges = listOf(domainEvent))
+        val todoListCreated = TodoListCreated(UUID.randomUUID(), "My todo list")
+        val todoList = buildTodoList(
+            id = TodoListId(todoListCreated.id),
+            uncommittedChanges = listOf(todoListCreated))
 
         repository.save(todoList)
 
-        val event = SerializedEvent(objectMapper.writeValueAsString(domainEvent), TodoListCreated::class.simpleName!!)
-        verify { eventStore.write(uuid, listOf(event)) }
+        val event = Event(
+            mapper.writeValueAsString(todoListCreated),
+            "TodoListCreated"
+        )
+        verify { eventStore.write(todoList.id.value, listOf(event), todoList.version) }
     }
 }

@@ -25,11 +25,12 @@ class CreateTodoListCommandHandlerTest {
         commandHandler.handle(command)
 
         val expected = buildTodoList(
-            TodoListId(command.aggregateId),
-            command.name,
-            Status.TODO,
-            emptyList(),
-            listOf(TodoListCreated(command.aggregateId, command.name)
+            id = TodoListId(command.aggregateId),
+            version = 1,
+            name = command.name,
+            status = Status.TODO,
+            tasks = emptyList(),
+            uncommittedChanges = listOf(TodoListCreated(command.aggregateId, command.name)
             )
         )
         verify { repository.save(expected) }

@@ -24,6 +24,7 @@ class TodoListTest {
             val expected = buildTodoList(
                 id = todoListId,
                 name = name,
+                version = 1,
                 uncommittedChanges = listOf(TodoListCreated(todoListId.value, name))
             )
             assertThat(todoList).isEqualTo(expected)
@@ -42,12 +43,13 @@ class TodoListTest {
                 TodoListCompleted(todoListId.value)
             )
 
-            val todoList = TodoList.Factory.recreate(history)
+            val todoList = TodoList.Factory.recreate(history, 10)
 
             assertThat(todoList).isEqualTo(
                 buildTodoList(
                     id = todoListId,
                     name = todoListName,
+                    version = 10,
                     status = DONE,
                     tasks = listOf(Task(taskId, taskName, DONE)),
                     uncommittedChanges = emptyList()
@@ -71,6 +73,7 @@ class TodoListTest {
                 buildTodoList(
                     id = todoList.id,
                     name = todoList.name,
+                    version = todoList.version,
                     tasks = listOf(task),
                     uncommittedChanges = todoList.uncommittedChanges + listOf(TaskAdded(todoList.id.value, task.id.value, task.name))
                 )
@@ -96,6 +99,7 @@ class TodoListTest {
                 buildTodoList(
                     id = todoList.id,
                     name = todoList.name,
+                    version = todoList.version,
                     status = TODO,
                     tasks = listOf(completedTask, anotherUncompletedTask, uncompletedTask.copy(status = DONE)),
                     uncommittedChanges = todoList.uncommittedChanges + listOf(newEvent)
@@ -136,6 +140,7 @@ class TodoListTest {
                 buildTodoList(
                     id = todoList.id,
                     name = todoList.name,
+                    version = todoList.version,
                     status = DONE,
                     tasks = listOf(completedTask, uncompletedTask.copy(status = DONE)),
                     uncommittedChanges = todoList.uncommittedChanges + listOf(taskCompleted, todoListCompleted)
