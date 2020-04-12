@@ -216,7 +216,7 @@ This restriction has some implications in our design:
 - And more implications and complexities ... check [links section](#related-links) at the end, for more information
  about event sourcing.
 
-Coming back to our new domain, these are the events that we will handle: 
+Coming back to our new domain, a todo-list lifecycle could be modelled as the following sequence of events: 
 
 - `TodoListCreated` 
 - `TaskAdded`
@@ -427,9 +427,10 @@ In a production environments, the best way to go would be to apply the patterns 
 - [Greg Young original document](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
 - [Greg Young m-r sample](https://github.com/gregoryyoung/m-r)
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
-- [Good article about when to use it and pros & cons](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
+- [Good article about when to use CQRS (pros & cons)](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
 - [Event Sourcing](https://microservices.io/patterns/data/event-sourcing.html)
 - [Event Sourcing by Martin Fowler](https://martinfowler.com/eaaDev/EventSourcing.html)
+- [Why event sourcing is awesome](https://dev.to/barryosull/event-sourcing-what-it-is-and-why-its-awesome)
 - [Designing an event-store](https://itnext.io/implementing-event-store-in-c-8a27138cc90)
 - [CQRS, things to consider](https://www.sderosiaux.com/articles/2019/08/29/cqrs-why-and-all-the-things-to-consider/)
 - [DZone CQRS intro](https://dzone.com/articles/cqrs-and-event-sourcing-intro-for-developers)
