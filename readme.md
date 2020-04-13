@@ -327,8 +327,8 @@ Query side, as CQRS trend advocates for, should be as thin as possible, getting 
 
 So, what are the responsibilities of the query side? 
 
-1. Read [projections](http://cqrs.wikidot.com/doc:projection), using event handlers
-2. Update [projections](http://cqrs.wikidot.com/doc:projection), using query handlers
+1. Read [projections](http://cqrs.wikidot.com/doc:projection), using query handlers (~read repository)
+2. Update [projections](http://cqrs.wikidot.com/doc:projection), using event handlers (~write repository)
  
 If we think about it, there is no domain modeling or business involved here, it is just update and read views.
 
