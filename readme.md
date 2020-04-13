@@ -327,10 +327,12 @@ Query side, as CQRS trend advocates for, should be as thin as possible, getting 
 
 So, what are the responsibilities of the query side? 
 
-1. Read [projections](http://cqrs.wikidot.com/doc:projection), using query handlers (~read repository)
-2. Update [projections](http://cqrs.wikidot.com/doc:projection), using event handlers (~write repository)
+1. Read [projections](http://cqrs.wikidot.com/doc:projection), using query handlers
+2. Update [projections](http://cqrs.wikidot.com/doc:projection), using event handlers
  
 If we think about it, there is no domain modeling or business involved here, it is just update and read views.
+
+We have even omitted the repository pattern here.
 
 Having said that, the query side should be as lean/thin as we can.
 
@@ -374,7 +376,7 @@ com.alo.cqrs.todolist.projection
                     |-- Events.kt //all posible events
                     `-- todolistdetail // all components related to todolistdetail projection
                         |-- Dtos.kt // views
-                        |-- EventHandlers.kt // view updaters (~repositories)
+                        |-- EventHandlers.kt // view updaters (~~repositories)
                         |-- HttpRoutes.kt // view endpoints
                         `-- QueryHandlers.kt // view readers (~repositories)
 ```
