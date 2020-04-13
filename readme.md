@@ -99,16 +99,15 @@ But, sadly it also comes with drawbacks:
 - Dual writes
 
 #### Dual writes
- A dual write describes the situation when you change data in 2 systems using local transactions, for
- example inserting a record in a database and send a message to a queue in a local transaction; 
- Imagine a situation like this:
+ A dual write describes the situation when you change data in 2 different systems, for example inserting a record in
+  a database and send a message to a queue in a local transaction; Imagine a situation like this:
 ```kotlin
 transaction.begin() 
 database.insert(record) 
 queue.send(message)
 transaction.commit() 
 ``` 
-Now, let's say that this codes is executed, but transaction commit fails, without an additional layer that ensures
+Now, this piece code is executed, but transaction commit fails, without an additional layer that ensures
  data consistency over both services, there is no way to rollback the message if it was already sent.
  
  In almost all the post that you can find over internet about CQRS, this problem is underestimated but it can lead you 
@@ -118,10 +117,10 @@ The way to solve/avoid dual writes is to split the communication into multiple s
  external system during each step, here some solutions:
 
 - [Transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html): If you use a RDBMS
- you can create a separate table (event-log), where you would store changes to be propagated to other systems. Then, 
+ you can create a separate table (event-log), where it will stored the changes to be done in other systems. Then, 
   when you have to do a dual write, you create a local transaction where you commit together the changes in
    your domain and the changes to be propagated in the event-log table. After that you just need to fetch the events
-    with and propagate the changes. 
+    and propagate the changes. 
  *Note*: Your projection mechanism will have to handle idempotency and retry mechanisms because the fetch can also fail.
 - Use [CDC](https://en.wikipedia.org/wiki/Change_data_capture) tools (change data capture), like Debezium, they will
  capture and propagate the changes ensuring consistency.
@@ -130,24 +129,25 @@ The way to solve/avoid dual writes is to split the communication into multiple s
 ### CQRs with event sourcing
 
 The last step is to introduce [event sourcing](https://microservices.io/patterns/data/event-sourcing.html), with this
- approach we would remove the dual write problem but also we will introduce new advantages and drawbacks. The
-  idea is the same as the previous approach but using an event store.
+ approach we would remove the dual write problem but we will introduce new advantages and drawbacks. The idea is the
+  same as the previous approach but using an event store as a database.
 
 <p align="center">
   <img src="misc/CQRS-ES.png"  width="55%"/>
 </p>
 
-Instead of keeping only the current state of the system updating it when we have a change, we will represent
- entities as a sequential list of events.
+In a event store, instead of keeping the current state of the system updating it when we have a change like we would
+ do in a relational database, we will represent entities as a sequential list of events, we will explain the topic
+  later on in a dedicated section.
 
-Till now, we have implemented CQRS, but usually CQRS doesn't come alone in term of patterns, so let's see how the
- system would look like with everything:
+Till now, we have implemented CQRS in essence, but it is an already evolved pattern and also comes together with
+ for other practices and patterns. Next diagram shows how a CQRS usually looks with :
 
 <p align="center">
   <img src="misc/CQRS-ES-Extended.png"/>
 </p>
 
-Patterns that come with CQRS:
+CQRS naturally fits with:
 - DDD
 - Command-bus
 - Command-handlers
@@ -155,8 +155,8 @@ Patterns that come with CQRS:
 - Event-sourcing
 - Optimistic locking
 
-Any of these patterns are mandatory to do CQRS, you don't have to use them, in prod environments you can omit/change
- them if they are over-complicating your system.
+Any of these patterns are mandatory to apply CQRS, you don't have to use them, in fact in productions environments you
+ should omit/change them if they are over-complicating your system.
 
 Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these patterns!  
 
@@ -164,8 +164,9 @@ Check [here](http://www.cqrs.nu/faq) to see a brief explanation of these pattern
 
 Having explained CQRS key concepts, let's think a problem to solve, where we can apply all it. 
 
-Imagine that we are in a fake company,they have an internal micro-services ecosystem and they need to build a new
- feature for all the frontends ... Boom! a TODO-LIST to help the customers to keep track of their daily obligations.
+Imagine that we are in a fake company, and of course we have an internal micro-service ecosystem growing up. 
+We need to build a new feature for all the frontends ... Boom! a **TODO-LIST** to help the customers keeping track of
+ their daily obligations.
 
 So, our sample application is a super simple TODO-LIST micro-service, where:
 
@@ -267,19 +268,18 @@ Event Store could be an *append-only storage mechanism*, where each entry could 
  |202dba03  |TaskAdded       |{json}  | 3      |
  +--------+------------------+--------+--------+ 
 ```
-With this simple definition in mind, we would be able to provide a simple database design for a CQRS environment
+With this simple definition in mind, we are be able to provide a simple database design for a CQRS environment
 , allowing to read and write sequences of immutable events for a particular aggregate, in our case instances of todo-lists.
 
- We would be also ready to implement an event store in almost any way, in memory, using a RDBMS, with a nosql
-  database or just a file ... but in this project, for the sake of simplicity, a simple in-memory solution is the
-   choice:
+ We are also ready to implement an event store in almost any way, in memory, using a RDBMS, with a nosql database or
+  just a file ... but in this project, for the sake of simplicity, a simple in-memory solution is the choice:
  - [Event store definition](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/EventStore.kt)
  - [In memory implementation](/command-side/src/main/kotlin/com/alo/cqrs/todolist/infrastructure/cqrs/InMemoryEventStore.kt)
  
 We could think in many more fields, like timestamp (when the event happened), eventId (to handle idempotency), 
-transactionId (to group events), sequence number (all events), clusterId (to group or subscribe streams in a more
- granular way) or a correlationId (allow reference to a particular transaction) but for our simple implementation we
-  don't need them.
+transactionId (to group events), sequence number (for all events), clusterId (to group or subscribe streams in a more
+ granular way) or a correlationId (allowing references to a particular transaction/request) but for our simple
+  implementation we don't need them.
 
 ### Fitting command-side in hexagonal architecture
 
@@ -304,26 +304,26 @@ Hexagonal architecture is all about ports and adapters, so one way to fit CQRS w
 
 - Application services: Use cases of the app, in our case the **command handlers**, they would implement the inbound
  ports to the hexagon. 
-- Domain: The hexagon itself, the business logic composed by the domain model and the ports interfaces.
+- Domain: The hexagon itself, the business logic composed by the domain model (DDD patterns) and port interfaces.
 - Infrastructure: The out-side world  
     - Adapters:
         - Inbound adapters: They call the entrypoints (inbound/driver ports) to the hexagon, in our case **HttpRoutes**  and  
         **EventHandlers**, they do it through the command bus.
         - Outbound adapters: They implement the outbound/driven ports and adapt/translate the outside world to our
-         domain, mainly **repositories**.
+         domain, mainly **aggregate repositories** implementations.
     - Non-hexagonal components: All the other components, **command-bus**, the **event-store** and any third party
      integration that the app would need. 
      
-As we already said before, this is just an example on how to do it, use this patterns depending on your app
+As we already said before, this is just an example on how to do it, use these patterns depending on your app
  requirements, for example command-handlers can be totally async or return values, or you can not use them at all.
 
 ### Simple Query-side
 
-Hexagonal architecture is a domain-centric architectural pattern, but since query side does not have
- domain or any business logic, do we need an hexagonal approach? 
+Hexagonal architecture is a domain-centric architectural pattern, but since query side does not have domain or any
+ business logic, do we need an hexagonal approach? 
 
-Query side, as CQRS trend advocates to, should be as thin as possible, getting as close to the data store, skipping
- any not necessary layer.
+Query side, as CQRS trend advocates for, should be as thin as possible, getting close to the data store, skipping
+ not necessary layers.
 
 So, what are the responsibilities of the query side? 
 
@@ -335,9 +335,10 @@ If we think about it, there is no domain modeling or business involved here, it 
 Having said that, the query side should be as lean/thin as we can.
 
 Since views/projections are isolated, meaning that they can be accessed and updated without any other dependency than
- the stream of event and the storage, a simple [package-by-feature](http://www.codingthearchitecture.com/2015/03/08/package_by_component_and_architecturally_aligned_testing.html) would be a good way to structure the project.
+ the stream of event and the storage, a simple [package-by-feature](http://www.codingthearchitecture.com/2015/03/08/package_by_component_and_architecturally_aligned_testing.html) would be a good way to structure the project, 
+ getting the benefits lower coupling and cohesion.
  
-Architecturally, query side would be:
+Architecturally, query-side would be:
 
 <p align="center">
   <img src="misc/query-side.png"  width="65%"/>
@@ -391,13 +392,14 @@ com.alo.cqrs.todolist.projection
     * [REST Assured](http://rest-assured.io/)
 
 ## Running tests
+Project has been driven by tests and it is fully tested, run all with:
 ```shell
 ./gradlew test
 ```
 
 ## Running the app
 
-Build the app $ run it:
+Build the app:
 ```shell
 ./gradlew build
 java -jar 
@@ -421,6 +423,9 @@ CQRS is not easy at all, it is complex and takes time to understand all the patt
 
 Even though in this example I have tried to use all the "cool" patterns, you don't need them, the basics of CQRS are
  separate Commands from Queries, that's all.
+
+You should use them only for parts of your ecosystem and only when you need highly concurrent systems with high
+ performance/availability/scalability.
  
 In a production environments, the best way to go would be to apply the patterns that you need, for example if you
  need to return values from commands, just do it, but first think why you are returning values, do you really need
@@ -430,6 +435,7 @@ In a production environments, the best way to go would be to apply the patterns 
 
 - [CQRS](http://www.cqrs.nu/)
 - [Greg Young original document](https://cqrs.files.wordpress.com/2010/11/cqrs_documents.pdf)
+- [Udi Dahan - Clarified CQRS](http://udidahan.com/2009/12/09/clarified-cqrs/)
 - [Greg Young m-r sample](https://github.com/gregoryyoung/m-r)
 - [Martin Fowler about CQRS](https://martinfowler.com/bliki/CQRS.html)
 - [Good article about when to use CQRS (pros & cons)](https://docs.microsoft.com/en-us/azure/architecture/patterns/cqrs)
