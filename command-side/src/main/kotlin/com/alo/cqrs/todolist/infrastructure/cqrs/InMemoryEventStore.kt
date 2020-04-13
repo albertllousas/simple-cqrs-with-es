@@ -33,7 +33,7 @@ class InMemoryEventStore : EventStore {
     }
 
     private fun publish(event: Event) {
-        subscribers.forEach { it.trigger(event.type, event.payload) }
+        subscribers.forEach { it.callback(event.type, event.payload) }
     }
 
     override fun subscribe(subscription: Subscription) {
