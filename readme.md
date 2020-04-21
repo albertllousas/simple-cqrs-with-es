@@ -348,8 +348,10 @@ Architecturally, query-side would be:
 
 ### Project structure
 
-The project has been split in three different modules:
+The [project code](./) has been split in three different modules:
+
 - `command-side`: All the write side code, as previously explained, follows the hexagonal architecture:
+
 ```kotlin
 com.alo.cqrs.todolist
                 `|-- application // command handlers,they implement the inbound ports
@@ -370,6 +372,7 @@ com.alo.cqrs.todolist
 ```
 
 - `query-side`: read side code, simple architecture, following feature-by-package:
+
 ```kotlin
 com.alo.cqrs.todolist.projection
                    `|-- EventConsumer.kt // subscriber to eventstore, dispatch changes to event-handlers
@@ -382,6 +385,7 @@ com.alo.cqrs.todolist.projection
 ```
 
 - `app`: Wiring up, app runner and [acceptance tests](./app/src/test/kotlin/com/alo/cqrs/todolist/acceptance)
+
 ## tech stack
 
 * Language: Kotlin
