@@ -350,7 +350,8 @@ Architecturally, query-side would be:
 
 The project code has been split in three different modules:
 
-- [`command-side`](https://github.com/albertllousas/simple-cqrs-with-es/command-side): All the write side code, as previously explained, follows the hexagonal architecture:
+- [`command-side`](https://github.com/albertllousas/simple-cqrs-with-es/tree/master/command-side): All the write side
+ code, as previously explained, follows the hexagonal architecture:
 
 ```kotlin
 com.alo.cqrs.todolist
@@ -371,7 +372,8 @@ com.alo.cqrs.todolist
 
 ```
 
-- [`query-side`](https://github.com/albertllousas/simple-cqrs-with-es/query-side): read side code, simple architecture, following feature-by-package:
+- [`query-side`](https://github.com/albertllousas/simple-cqrs-with-es/tree/master/query-side): read side code, simple
+ architecture, following feature-by-package:
 
 ```kotlin
 com.alo.cqrs.todolist.projection
@@ -384,7 +386,8 @@ com.alo.cqrs.todolist.projection
                         `-- QueryHandlers.kt // view readers (~repositories)
 ```
 
-- [`app`](https://github.com/albertllousas/simple-cqrs-with-es/app): Wiring up, app runner and [acceptance tests](https://github.com/albertllousas/simple-cqrs-with-es/app/src/test/kotlin/com/alo/cqrs/todolist/acceptance)
+- [`app`](https://github.com/albertllousas/simple-cqrs-with-es/tree/master/app): Wiring up, app runner and
+ [acceptance tests](https://github.com/albertllousas/simple-cqrs-with-es/tree/master/app/src/test/kotlin/com/alo/cqrs/todolist/acceptance)
 
 ## tech stack
 
