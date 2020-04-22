@@ -4,7 +4,6 @@ import com.alo.cqrs.todolist.domain.model.DomainEvent
 import com.alo.cqrs.todolist.domain.model.todolist.Status
 import com.alo.cqrs.todolist.domain.model.todolist.Task
 import com.alo.cqrs.todolist.domain.model.todolist.TodoList
-import com.alo.cqrs.todolist.domain.model.todolist.TodoListCreated
 import com.alo.cqrs.todolist.domain.model.todolist.TodoListId
 import com.github.javafaker.Faker
 import java.util.UUID
@@ -18,4 +17,4 @@ fun buildTodoList(
     status: Status = Status.TODO,
     tasks: List<Task> = emptyList(),
     uncommittedChanges: List<DomainEvent> = emptyList()
-) = TodoList.Factory.restoreState(id, name, version, status, tasks, uncommittedChanges)
+) = TodoList.Factory.unsafeRestoreState(id, name, version, status, tasks, uncommittedChanges)

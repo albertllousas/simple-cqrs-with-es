@@ -75,7 +75,7 @@ data class TodoList private constructor(
                 uncommittedChanges = listOf(TodoListCreated(id.value, name))
             )
 
-        fun restoreState(
+        fun unsafeRestoreState(
             id: TodoListId,
             name: String,
             version: Long,
