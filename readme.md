@@ -117,11 +117,12 @@ The way to solve/avoid dual writes is to split the communication into multiple s
  external system during each step, here some solutions:
 
 - [Transactional outbox pattern](https://microservices.io/patterns/data/transactional-outbox.html): If you use a RDBMS
- you can create a separate table (event-log), where it will stored the changes to be done in other systems. Then, 
+ you can create a separate table (out-box), where it will stored the changes to be done in other systems. Then, 
   when you have to do a dual write, you create a local transaction where you commit together the changes in
-   your domain and the changes to be propagated in the event-log table. After that you just need to fetch the events
+   your domain and the changes to be propagated in out-box table. After that you just need to fetch the events
     and propagate the changes. 
- *Note*: Your projection mechanism will have to handle idempotency and retry mechanisms because the fetch can also fail.
+ *Note*: Your projection mechanism will have to handle idempotency and retry mechanisms because the propagation part can
+  also fail and deliver messages more than once.
 - Use [CDC](https://en.wikipedia.org/wiki/Change_data_capture) tools (change data capture), like Debezium, they will
  capture and propagate the changes ensuring consistency.
 - Use an event-store in the write side, this will be explained in the following section.  
